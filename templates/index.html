@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="wireframe">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veric</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../static/css/style.css"> <!-- Include custom CSS -->
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Include Tailwind CSS -->
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet"> <!-- Include Google Fonts -->
+
+    <!-- Tailwind Customization Script -->
+    <script>
+        var tailwind = {
+            theme: {
+                colors: {
+                    content: '#386641',
+                    'logo-prime': '#6A994E',
+                    'logo-background': '#A7C957',
+                    background: '#E9F5DB',
+                    black: '#001000',
+                },
+            },
+            plugins: [
+                require('@tailwindcss/forms'),
+                require('tailwindcss-container-queries'),
+                require('@tailwindcss/aspect-ratio')
+            ],
+        };
+    </script>
+</head>
+
+<body class="flex flex-col items-center justify-start min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full h-20 shadow-sm flex items-center justify-between px-4">
+        <div class="flex items-center">
+            <span class="text-3xl font-bold text-gray-800">Veric</span> <!-- Logo or site title -->
+        </div>
+        <nav>
+            <ul class="flex items-center space-x-4">
+                <!-- NEEDED: Jinja logic -->
+                <li class="capitalize px-4 py-2 bg-content text-white rounded action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
+                    <a class="h-full w-full" href="/">Link 1</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12">
+        <section class="w-full flex items-center justify-between">
+            <div class="flex flex-col items-start justify-center space-y-4">
+                <!-- NEEDED: Jinja logic -->
+                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
+                    Edit Job Offer
+                </button>
+                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
+                    Look at New Hires
+                </button>
+                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
+                    Browse All Hires
+                </button>
+            </div>
+            <div>
+                <img src="https://placehold.co/400?text=Happy+Person" alt="Happy Person" class="w-84 h-84 object-cover rounded-lg shadow-lg">
+            </div>
+        </section>
+        <section class="w-full flex items-center justify-start space-x-10">
+            <div>
+                <img src="https://placehold.co/400?text=Random+picture" alt="Random picture" class="w-84 h-84 object-cover rounded-lg shadow-lg aspect-square">
+            </div>
+            <div class="flex flex-col items-start justify-center max-w-[calc(100%-20rem)]">
+                <p class="text-4xl">
+                    Remember to read the 
+                    CV of your upcoming workers
+                    and check their background!
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
+        <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
+        <p class="text-center text-gray-700">
+            &copy; 2023 Veric. All rights reserved.
+        </p>        
+    </footer>
+
+    <!-- External JavaScript -->
+    <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script> <!-- Include Font Awesome -->
+</body>
+</html>

@@ -1,0 +1,78 @@
+@font-face{
+  font-family: 'j-sans';
+  src:
+    url("../fonts/JosefinSans-Regular.ttf") format("truetype"),
+    url("../fonts/JosefinSans-Bold.ttf") format("truetype"),
+    url("../fonts/JosefinSans-Italic.ttf") format("truetype"),
+    url("../fonts/JosefinSans-BoldItalic.ttf") format("truetype"),
+    url("../fonts/JosefinSans-semibold.ttf") format("truetype"),
+    url("../fonts/JosefinSans-SemiboldItalic.ttf") format("truetype");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+:root{
+  --content: #386641;
+  --logo-prime: #6A994E;
+  --logo-background: #A7C957;
+  --background: #E9F5DB;
+  --black: #001000;
+}
+
+/* body{
+  background-color: #1a202c;
+  color: #e2e8f0;
+}
+ */
+
+
+body{
+  font-family: 'j-sans', sans-serif;
+  margin: 0;
+  color: var(--black) !important;
+  background-color: var(--background) !important;
+}
+
+::selection{
+  background-color: var(--logo-prime);
+  color: var(--background);
+  font-weight: bold;
+  padding: 0.2rem 0.325rem;
+}
+
+.logo-container{
+  
+}
+
+.logo-container .logo{
+  color: var(--logo-prime);
+  user-select: none;
+  cursor: pointer;
+}
+
+.nav-container{
+  
+}
+
+.navlinks{
+  
+}
+
+.navlink{
+  
+}
+
+.action-btn{
+  background-color: var(--content);
+}
+
+.action-btn:hover{
+  background-color: var(--logo-background);
+}
+
+footer{
+  
+}
