@@ -1,0 +1,32 @@
+{% macro call_to_actions(action_list) %}
+    {% for action in action_list %}
+        <a href="{{ action.href }}" class="block w-full">
+            <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn w-full hover:bg-content">
+                {{ action.name }}
+            </button>
+        </a>
+    {% endfor %}
+{% endmacro %}
+
+{% macro nav_link(navlink) %}
+    <li class="capitalize px-4 py-2 bg-content text-white rounded action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
+        <a class="h-full w-full" href="{{ navlink.href }}">{{ navlink.name }}</a>
+    </li>
+{% endmacro %}
+
+{% macro navbar(logo, navlinks=[]) %}
+ <header class="w-full h-20 shadow-sm flex items-center justify-between px-4">
+     <div class="flex items-center">
+         <!-- Logo or site title -->
+         {{ logo }}
+     </div>
+     <nav>
+         <ul class="flex items-center space-x-4">
+             {% for navlink in navlinks %}
+                {{ nav_link(navlink) }}
+             {% endfor %}
+             {{ nav_link({ "href": "/", "name": "Home" }) }} 
+         </ul>
+     </nav>
+ </header>
+{% endmacro %}

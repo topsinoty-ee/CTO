@@ -37,8 +37,8 @@ body{
 }
 
 ::selection{
-  background-color: var(--logo-prime);
-  color: var(--background);
+  /*background-color: var(--logo-prime);
+  color: var(--background);*/
   font-weight: bold;
   padding: 0.2rem 0.325rem;
 }

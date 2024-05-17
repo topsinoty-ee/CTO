@@ -1,3 +1,7 @@
+<!-- Import Jinja Macros -->
+{% from 'macros.html' import navbar, call_to_actions as actions %}
+
+
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
 <head>
@@ -38,34 +42,26 @@
 <body class="flex flex-col items-center justify-start min-h-screen">
 
     <!-- Header -->
-    <header class="w-full h-20 shadow-sm flex items-center justify-between px-4">
-        <div class="flex items-center">
-            <span class="text-3xl font-bold text-gray-800">Veric</span> <!-- Logo or site title -->
-        </div>
-        <nav>
-            <ul class="flex items-center space-x-4">
-                <!-- NEEDED: Jinja logic -->
-                <li class="capitalize px-4 py-2 bg-content text-white rounded action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
-                    <a class="h-full w-full" href="/">Link 1</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    {% set nav_links = [
+        { "href": "/", "name": "Link 1" },
+        { "href": "/", "name": "Link 2" },
+    ] %}
+    
+    {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
+    
+    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
     <!-- Main Content -->
     <main class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12">
         <section class="w-full flex items-center justify-between">
             <div class="flex flex-col items-start justify-center space-y-4">
-                <!-- NEEDED: Jinja logic -->
-                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
-                    Edit Job Offer
-                </button>
-                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
-                    Look at New Hires
-                </button>
-                <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn hover:bg-content">
-                    Browse All Hires
-                </button>
+                {% set actions_list = [
+                    {'name': "Edit Job Offers", 'href': "/job-offers"},
+                    {'name': "Look at New Hires", 'href': "/look-hires"},
+                    {'name': "Browse All Hires", 'href': "/browse-hires"}
+                ] %}
+                
+                {{ actions(actions_list) }}
             </div>
             <div>
                 <img src="https://placehold.co/400?text=Happy+Person" alt="Happy Person" class="w-84 h-84 object-cover rounded-lg shadow-lg">
