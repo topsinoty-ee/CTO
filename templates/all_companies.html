@@ -7,8 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veric</title>
-    
+    <title>All Companies (for testing)</title>
+
     <!-- External CSS -->
     <link rel="stylesheet" href="../static/css/style.css"> <!-- Include custom CSS -->
     <script src="https://cdn.tailwindcss.com"></script> <!-- Include Tailwind CSS -->
@@ -46,50 +46,41 @@
         { "href": "/all-companies", "name": "Companies (for testing)" },
         { "href": "/", "name": "Link 2" },
     ] %}
-    
+
     {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
-    
-    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+
+    {{ navbar(logo=logo | safe, navlinks=nav_links) }}
 
     <!-- Main Content -->
     <main class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12">
-        <section class="w-full flex items-center justify-between">
-            <div class="flex flex-col items-start justify-center space-y-4">
-                {% set actions_list = [
-                    {'name': "Edit Job Offers", 'href': "/job-offers"},
-                    {'name': "Look at New Hires", 'href': "/look-hires"},
-                    {'name': "Browse All Hires", 'href': "/browse-hires"}
-                ] %}
-                
-                {{ actions(actions_list) }}
+        <h3>Company</h3>
+        {% for company in company_records %}
+            <div class='shadow-sm flex flex-col items-center justify-center p-4 space-y-4 border border-gray-300 rounded-lg'>
+                <span>name: {{company.fields.Name}}</span>
+                <span>id: {{company.id}}</span>
+                {% if company.fields.Applicants and company.fields.Applicants | length > 0 %}
+                    <span>applicants: {{ company.fields.Applicants | length}}</span>
+                {% endif %}
+                <span>
+                <span>
+                    {% for application_id in company.fields.Applications %}
+                        {% set application = search(application_id) %}
+                        {% if application %}
+                            <span class="bg-gray-200 rounded-md p-2">{{ application.fields.Name }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </span>
+
             </div>
-            <div>
-                <img src="https://placehold.co/400?text=Happy+Person" alt="Happy Person" class="w-84 h-84 object-cover rounded-lg shadow-lg">
-            </div>
-        </section>
-        <section class="w-full flex items-center justify-start space-x-10">
-            <div>
-                <img src="https://placehold.co/400?text=Random+picture" alt="Random picture" class="w-84 h-84 object-cover rounded-lg shadow-lg aspect-square">
-            </div>
-            <div class="flex flex-col items-start justify-center max-w-[calc(100%-20rem)]">
-                <p class="text-4xl">
-                    Remember to read the 
-                    CV of your upcoming workers
-                    and check their background!
-                </p>
-            </div>
-        </section>
+        {% endfor %}        
     </main>
-
+    
     <!-- Footer -->
-    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
-        <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
-        <p class="text-center text-gray-700">
-            &copy; 2023 Veric. All rights reserved.
-        </p>        
-    </footer>
-
-    <!-- External JavaScript -->
-    <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script> <!-- Include Font Awesome -->
+<footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
+    <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
+    <p class="text-center text-gray-700">
+        &copy; 2023 Veric. All rights reserved.
+    </p>        
+</footer>
 </body>
 </html>
