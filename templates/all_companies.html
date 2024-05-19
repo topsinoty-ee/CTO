@@ -55,7 +55,7 @@
     <main class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12">
         <h3>Company</h3>
         {% for company in company_records %}
-            <div class='shadow-sm flex flex-col items-center justify-center p-4 space-y-4 border border-gray-300 rounded-lg'>
+            <div class='shadow-sm flex flex-col items-center justify-center p-4 space-y-4 border border-gray-300 rounded-lg bg-white'>
                 <span>name: {{company.fields.Name}}</span>
                 <span>id: {{company.id}}</span>
                 {% if company.fields.Applicants and company.fields.Applicants | length > 0 %}

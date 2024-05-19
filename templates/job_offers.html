@@ -35,12 +35,133 @@
     </script>
 </head>
 <body>
-<!--- HEADER --->
+    <header class="w-full m-0">
+        {% set nav_links = [
+            { "href": "/all-companies", "name": "Companies (for testing)" },
+            { "href": "/", "name": "Link 2" },
+        ] %}
 
+        {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
+
+        {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+    </header>
 
     
 <!--- MAIN --->
+<main class="w-full">
+    <section>
+        <div class="flex flex-col w-2/3">
+            {% for company in company_records %}
+                <form method="POST" action="/"> <!--- ret to homepage or company page? --->
 
+<!----------------------------------------------- NAME ------------------------------------------------>
+                    
+                    <label for="company_name">Name</label>
+                    <input
+                      type="text"
+                      name="company_description"
+                      id="{{ company.fields.Name }}"
+                      value="{{ company.fields.Name }}"
+                      placeholder="Type here..."
+                      required
+                    >
+
+<!----------------------------------------------- POSITIONS ------------------------------------------------>
+
+                    <label for="company_applications">Positions</label> <!--- applications? 🤷‍♀️--->
+                    <select name="company_applications">
+                        {% for application_id in company.fields.Applications %}
+                        {% set application = search(application_id) %}
+                            {% if application %}
+                                <option value="{{company.id}}" selected>
+                                    {{ company.fields.Applications }}
+                                </option>
+                            {% else %}
+                                <option value="{{company.id}}">
+                                    {{ company.fields.Applications }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+
+<!----------------------------------------------- BENEFITS ------------------------------------------------>
+
+                    <label for="company_benefits">Benefits</label>
+                    <textarea
+                      type="text"
+                      name="company_benefits"
+                      id="{{ company.fields.Benefits }}"
+                      value="{{ company.fields.Benefits }}"
+                      placeholder="Type here..."
+                      required
+                    </textarea>
+
+<!----------------------------------------------- EXPECTATIONS ------------------------------------------------>
+
+                    <label for="company_expectations">Expectations</label>
+                    <textarea
+                      type="text"
+                      name="company_expectations"
+                      id="{{ company.fields.Expectations }}"
+                      value="{{ company.fields.Expectations }}"
+                      placeholder="Type here..."
+                      required
+                    </textarea>
+
+<!----------------------------------------------- REQUIREMENTS ------------------------------------------------>
+                    
+                    <label for="company_requirements">Requirements</label>
+                    <textarea
+                      type="text"
+                      name="company_requirements"
+                      id="{{ company.fields.Requirements }}"
+                      value="{{ company.fields.Requirements }}"
+                      placeholder="Type here..."
+                      required
+                    </textarea>
+
+<!----------------------------------------------- PAY ------------------------------------------------>
+
+                    <label for="company_salary">Salary</label> <!--- dropdown ? --->
+                    <select name="company_salary">
+                        {% for salary in company.fields.Salary %}
+                            {% if salary %}
+                                <option value="{{company.id}}" selected>
+                                    {{ company.fields.Salary }}
+                                </option>
+                            {% else %}
+                                <option value="{{company.id}}">
+                                    {{ company.fields.Salary }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+
+<!----------------------------------------------- DESC ------------------------------------------------>
+                    
+                    <label for="company_description">Description</label>
+                    <textarea
+                      type="text"
+                      name="company_description"
+                      id="{{ company.fields.Description }}"
+                      value="{{ company.fields.Description }}"
+                      placeholder="Type here..."
+                      required
+                    </textarea>
+    
+    
+<!----------------------------------------------- SAVERET ------------------------------------------------>
+    
+                    <button>Save</button>
+                    <button>Return</button>
+                </form>
+            {%endfor%}
+        </div>
+    </section>
+    <section>
+        <img src="">
+    </section>
+</main>
 
 
     

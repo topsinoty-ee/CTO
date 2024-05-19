@@ -13,9 +13,9 @@ def posts():
     return render_template('index.html')
 
 
-@app.route('/job-offers', methods=['GET'])
-def job_offers():
-    return render_template('job_offers.html')
+@app.route('/job-offers', methods=['GET', 'POST'])
+def edit_job_offers():
+    return render_template('job_offers.html', company_records=company_records, search=search_record_by_id)
 
 @app.route('/all-companies', methods=['GET'])
 def all_companies():
