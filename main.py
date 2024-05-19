@@ -8,8 +8,6 @@ app = Flask(
   static_folder='static'
 )
 
-#db?
-
 @app.route('/', methods=['GET'])
 def posts():
     return render_template('index.html')
@@ -26,15 +24,14 @@ def all_companies():
         company_records=company_records, search=search_record_by_id
     )
 
-
 @app.route('/new-hires', methods=['GET'])
 def new_hires():
-    return render_template('look_hires.html')
+    return render_template('look_hires.html',company_records=company_records)
 
 
 @app.route('/browse-all', methods=['GET'])
 def browse_all():
-    return render_template('browse_all.html')
+    return render_template('browse_all.html',company_records=company_records, search=search_record_by_id)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3000)
