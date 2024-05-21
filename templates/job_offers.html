@@ -1,3 +1,5 @@
+{% from 'macros.html' import navbar, call_to_actions as actions %}
+
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
 <head>
@@ -34,32 +36,56 @@
         };
     </script>
 </head>
-<body>
-    <header class="w-full m-0">
-        {% set nav_links = [
-            { "href": "/all-companies", "name": "Companies (for testing)" },
-            { "href": "/", "name": "Link 2" },
-        ] %}
+<body class="flex flex-col items-center justify-start min-h-screen">
+    {% set nav_links = [
+        { "href": "/all-companies", "name": "Companies (for testing)" },
+        { "href": "/", "name": "Link 2" },
+    ] %}
 
-        {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
+    {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
 
-        {{ navbar(logo=logo|safe, navlinks=nav_links) }}
-    </header>
+    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
     
 <!--- MAIN --->
-<main class="w-full">
-    <section>
+<main>
+    <section class="w-full ">
         <div class="flex flex-col w-2/3">
             {% for company in company_records %}
-                <form method="POST" action="/"> <!--- ret to homepage or company page? --->
+                <form method="POST" action="/job-offers/{{company.id}}" class=> <!--- ret to homepage or company page? --->
+
+<!----------------------------------------------- ABOUT ------------------------------------------------>
+
+                    <label for="company_about">About</label>
+                    <textarea
+                      name="company_about"
+                      id="{{ company.fields.About }}"
+                      value="{{ company.fields.About }}"
+                      placeholder="Type here..."
+                      rows="4"
+                      required
+                        >
+                    </textarea>
+            
+<!----------------------------------------------- CONTACT ------------------------------------------------>
+
+                    <label for="company_contact">Contact info</label>
+                    <textarea
+                      name="company_contact"
+                      id="{{ company.fields.Contact }}"
+                      value="{{ company.fields.Contact }}"
+                      placeholder="Type here..."
+                      rows="4"
+                      required
+                        >
+                    </textarea>
 
 <!----------------------------------------------- NAME ------------------------------------------------>
                     
                     <label for="company_name">Name</label>
                     <input
                       type="text"
-                      name="company_description"
+                      name="company_name"
                       id="{{ company.fields.Name }}"
                       value="{{ company.fields.Name }}"
                       placeholder="Type here..."
@@ -93,6 +119,7 @@
                       id="{{ company.fields.Benefits }}"
                       value="{{ company.fields.Benefits }}"
                       placeholder="Type here..."
+                      rows="2"
                       required
                     </textarea>
 
@@ -105,6 +132,7 @@
                       id="{{ company.fields.Expectations }}"
                       value="{{ company.fields.Expectations }}"
                       placeholder="Type here..."
+                      rows="2"
                       required
                     </textarea>
 
