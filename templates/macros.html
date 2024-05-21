@@ -8,6 +8,7 @@
     {% endfor %}
 {% endmacro %}
 
+
 {% macro nav_link(navlink) %}
     <li class="capitalize px-4 py-2 bg-content text-white rounded action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
         <a class="h-full w-full" href="{{ navlink.href }}">{{ navlink.name }}</a>
@@ -15,7 +16,7 @@
 {% endmacro %}
 
 {% macro navbar(logo, navlinks=[]) %}
- <header class="w-full h-20 shadow-sm flex items-center justify-between px-4">
+ <header class="w-full h-20 shadow-sm flex items-center justify-between px-4 sticky top-0 z-999 nav-container">
      <div class="flex items-center">
          <!-- Logo or site title -->
          {{ logo }}
