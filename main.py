@@ -11,6 +11,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app.secret_key = os.urandom(24)
 
+
 @app.route('/', methods=['GET'])
 def home():
     """
@@ -37,10 +38,12 @@ def job_offers():
         Rendered HTML template for the job offers page.
     """
     if request.method == 'POST':
+
         @login_required
         # Handle form submission logic here, if any
         def post_application():
             pass
+
     return render_template('job_offers.html',
                            company_records=company_records,
                            search=search_record_by_id)
@@ -150,6 +153,5 @@ def company_applications(company_id):
 
 
 if __name__ == "__main__":
-    debug=True
+    debug = True
     app.run(host='0.0.0.0', port=3000)
-    
