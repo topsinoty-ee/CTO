@@ -31,3 +31,35 @@
      </nav>
  </header>
 {% endmacro %}
+
+
+{% macro render_field(field) %}
+  <div class="mb-4">
+    <label for="{{ field.id }}" class="block text-sm font-medium ">{{ field.label }}</label>
+    {% if field.type == 'dropdown' %}
+      <select id="{{ field.id }}" name="{{ field.name }}" class="pt-1 block w-full  rounded-md shadow-sm ">
+        {% for option in field.options %}
+          <option value="{{ option.value }}">{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    {% else %}
+      <input id="{{ field.id }}" type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value }}" placeholder="{{ field.placeholder }}" {% if field.required %}required{% endif %} class="pt-1 block w-full rounded-md shadow-sm ">
+    {% endif %}
+    {% if field.errors %}
+      <ul class="pt-1 text-sm text-red-600">
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_form(action, method, fields) %}
+  <form action="{{action}}" method="{{method}}">
+    {% for field in fields %}
+      {{ render_field(field) }}
+    {% endfor %}
+    <button type="submit" class="w-full text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2">Submit</button>
+  </form>
+{% endmacro %}
