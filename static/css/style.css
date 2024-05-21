@@ -39,8 +39,8 @@ body{
 ::selection{
   /*background-color: var(--logo-prime);
   color: var(--background);*/
-  font-weight: bold;
-  padding: 0.2rem 0.325rem;
+  /* font-weight: bold;
+  padding: 0.2rem 0.325rem; */
 }
 
 .logo-container{
@@ -54,7 +54,7 @@ body{
 }
 
 .nav-container{
-  
+  background-color: var(--background) !important;
 }
 
 .navlinks{
