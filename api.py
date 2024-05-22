@@ -33,11 +33,13 @@ def check_env_vars():
     if missing_vars:
         raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
 
+# Check environment variables
 check_env_vars()
 
 if API_KEY is None:
     raise ValueError("API_KEY environment variable is not set.")
 
+# Initialize Airtable API client
 api = Api(API_KEY)
 
 def init_table(api, base_key, table_key):
@@ -60,6 +62,15 @@ users_table = init_table(api, BASE_KEY, USERS_TABLE_KEY)
 applications_table = init_table(api, BASE_KEY, APPLICATIONS_TABLE_KEY)
 
 def fetch_all_records(table):
+    """
+    Fetch all records from a given table.
+
+    Args:
+        table (Table): The table from which to fetch records.
+
+    Returns:
+        list: List of records fetched from the table, or an empty list if an error occurred.
+    """
     try:
         records = table.all()
         logger.info(f"Fetched {len(records)} records from {table.name}")
@@ -68,7 +79,6 @@ def fetch_all_records(table):
         logger.error(f"Error fetching records from table {table.name}: {e}")
         return []
 
-
 # Fetch all records from the tables
 company_records = fetch_all_records(company_table)
 users_records = fetch_all_records(users_table)
@@ -76,7 +86,7 @@ applications_records = fetch_all_records(applications_table)
 
 def search_record_by_id(table, record_id):
     """
-    Search for a record by ID in the company table.
+    Search for a record by ID in a specified table.
 
     Args:
         table (Table): The table to search.
@@ -96,8 +106,18 @@ def search_record_by_id(table, record_id):
         logger.error(f"Error searching for record(s) with ID {record_id}: {e}")
         return None
 
-
 def sign_up_as_company(email, password, company_name):
+    """
+    Sign up a new company.
+
+    Args:
+        email (str): The email address of the company.
+        password (str): The password for the company account.
+        company_name (str): The name of the company.
+
+    Returns:
+        dict: The created company record, or None if an error occurred.
+    """
     try:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         logger.info(f"Hashed password for {email}")
@@ -112,6 +132,16 @@ def sign_up_as_company(email, password, company_name):
         return None
 
 def login_as_company(email, password):
+    """
+    Log in as a company.
+
+    Args:
+        email (str): The email address of the company.
+        password (str): The password for the company account.
+
+    Returns:
+        dict: The authenticated company record, or None if authentication failed.
+    """
     try:
         companies_records = company_table.all(formula=f"{{email}} = '{email}'")
         if not companies_records:

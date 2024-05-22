@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, redirect
 import os
-
 from flask.helpers import url_for
-from api import (company_table, company_records, users_table, users_records,
-                 applications_table, applications_records, search_record_by_id,
-                 fetch_all_records, init_table, sign_up_as_company,
+from api import (company_table, company_records, search_record_by_id, sign_up_as_company,
                  login_as_company)
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
@@ -16,17 +13,41 @@ login_manager.init_app(app)
 
 
 class User(UserMixin):
+    """
+    User class for Flask-Login integration. Inherits from UserMixin.
+
+    Attributes:
+        id (str): User identifier, typically the company ID.
+    """
 
     def __init__(self, user_id):
         self.id = user_id
 
     @staticmethod
     def get(user):
+        """
+        Static method to get the user ID.
+
+        Args:
+            user (User): User object.
+
+        Returns:
+            str: User ID.
+        """
         return user.id
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    Load the user from the user ID.
+
+    Args:
+        user_id (str): The user ID.
+
+    Returns:
+        User: User object with the given user ID.
+    """
     return User(user_id)
 
 
@@ -35,11 +56,14 @@ def home():
     """
     Render the homepage.
 
+    If the user is authenticated, redirect them to their company dashboard.
+    Otherwise, render the homepage.
+
     Returns:
-        Rendered HTML template for the homepage.
+        str: Rendered HTML template for the homepage.
     """
     if current_user.is_authenticated:
-        return redirect('/company-dashboard/<company_id>')
+        return redirect(f'/company-dashboard/{current_user.id}')
     else:
         return render_template('index.html')
 
@@ -56,7 +80,7 @@ def job_offers():
         Handle form submissions for job offers.
 
     Returns:
-        Rendered HTML template for the job offers page.
+        str: Rendered HTML template for the job offers page.
     """
     if request.method == 'POST':
         # Handle form submission logic here, if any
@@ -72,7 +96,7 @@ def all_companies():
     Display all companies with specific fields.
 
     Returns:
-        Rendered HTML template for all companies with company records.
+        str: Rendered HTML template for all companies with company records.
     """
     fields = [
         'name', 'id', 'contact', 'benefits', 'description', 'applications',
@@ -81,8 +105,7 @@ def all_companies():
 
     # Build the companies_data list using list comprehension
     companies_data = [{
-        f'company_{field.lower()}':
-        company['fields'].get(field, '')
+        f'company_{field.lower()}': company['fields'].get(field, '')
         for field in fields
     } for company in company_records]
 
@@ -97,7 +120,7 @@ def new_hires():
     Display the new hires page.
 
     Returns:
-        Rendered HTML template for new hires with company records.
+        str: Rendered HTML template for new hires with company records.
     """
     return render_template('look_hires.html', company_records=company_records)
 
@@ -108,7 +131,7 @@ def browse_all():
     Display the browse all page with company records.
 
     Returns:
-        Rendered HTML template for browsing all records with company records.
+        str: Rendered HTML template for browsing all records with company records.
     """
     return render_template('browse_all.html',
                            company_records=company_records,
@@ -117,13 +140,24 @@ def browse_all():
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
+    """
+    Handle the sign-up process for companies.
+
+    GET:
+        Render the sign-up page.
+
+    POST:
+        Process the sign-up form submission and create a new company account.
+
+    Returns:
+        str: Rendered HTML template for the sign-up page or redirect to the company's dashboard.
+    """
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         company_name = request.form['company_name']
 
-        if not email.strip() and not password.strip(
-        ) and not company_name.strip():
+        if not email.strip() and not password.strip() and not company_name.strip():
             return render_template('sign_up.html',
                                    error='Please fill in all fields.')
         # Sign up as a company
@@ -141,9 +175,21 @@ def sign_up():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle the login process for companies.
+
+    GET:
+        Render the login page.
+
+    POST:
+        Process the login form submission and authenticate the user.
+
+    Returns:
+        str: Rendered HTML template for the login page or redirect to the company's dashboard.
+    """
     if request.method == 'POST':
         next_url = request.args.get('next')
-        
+
         email = request.form['email']
         password = request.form['password']
 
@@ -163,7 +209,8 @@ def login():
             # Redirect to the company's dashboard
             company_id = company["id"].strip('{}')  # Remove curly braces
             if next_url:
-                return redirect(f'/company-dashboard/{company_id}?next={next_url}')
+                return redirect(
+                    f'/company-dashboard/{company_id}?next={next_url}')
             else:
                 return redirect(f'/company-dashboard/{company_id}')
         else:
@@ -176,6 +223,15 @@ def login():
 @app.route('/company-dashboard/<company_id>', methods=['GET'])
 @login_required
 def company_dashboard(company_id):
+    """
+    Display the company's dashboard.
+
+    Args:
+        company_id (str): The ID of the company.
+
+    Returns:
+        str: Rendered HTML template for the company's dashboard with company data.
+    """
     fields = [
         'name', 'id', 'contact', 'benefits', 'description', 'applications',
         'about', 'salary', 'applicants'
@@ -187,17 +243,38 @@ def company_dashboard(company_id):
 @app.route('/company-dashboard/<company_id>/applications', methods=['GET'])
 @login_required
 def company_applications(company_id):
+    """
+    Display the company's applications page.
+
+    Args:
+        company_id (str): The ID of the company.
+
+    Returns:
+        str: Rendered HTML template for the company's applications page.
+    """
     return render_template('applications.html', company_id=company_id)
 
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    """
+    Handle unauthorized access attempts.
+
+    Returns:
+        Redirect: Redirects the user to the login page with a 'next' parameter.
+    """
     return redirect(url_for('login', next=request.endpoint))
 
 
 @app.route('/logout')
 @login_required
 def logout():
+    """
+    Log out the current user.
+
+    Returns:
+        Redirect: Redirects the user to the homepage.
+    """
     logout_user()
     return redirect('/')
 
