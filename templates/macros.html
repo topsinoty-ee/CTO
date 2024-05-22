@@ -17,16 +17,17 @@
 
 {% macro navbar(logo, navlinks=[]) %}
  <header class="w-full h-20 shadow-sm flex items-center justify-between px-4 sticky top-0 z-999 nav-container">
-     <div class="flex items-center">
+     <div class="flex items-center"> 
+       <a href='/'>
          <!-- Logo or site title -->
-         {{ logo }}
+          {{ logo }}
+       </a>
      </div>
      <nav>
          <ul class="flex items-center space-x-4">
              {% for navlink in navlinks %}
                 {{ nav_link(navlink) }}
              {% endfor %}
-             {{ nav_link({ "href": "/", "name": "Home" }) }} 
          </ul>
      </nav>
  </header>

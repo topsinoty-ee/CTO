@@ -1,12 +1,11 @@
 import bcrypt
-import logging
+from logging import debug, getLogger, basicConfig, INFO
 import os
-
 from pyairtable import Api
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+basicConfig(level=INFO)
+logger = getLogger(__name__)
 
 # Environment variables
 API_KEY = os.environ.get('AIRTABLE_API_KEY')
@@ -61,20 +60,14 @@ users_table = init_table(api, BASE_KEY, USERS_TABLE_KEY)
 applications_table = init_table(api, BASE_KEY, APPLICATIONS_TABLE_KEY)
 
 def fetch_all_records(table):
-    """
-    Fetch all records from a given table.
-
-    Args:
-        table (Table): The table to fetch records from.
-
-    Returns:
-        list: A list of all records.
-    """
     try:
-        return table.all()
+        records = table.all()
+        logger.info(f"Fetched {len(records)} records from {table.name}")
+        return records
     except Exception as e:
         logger.error(f"Error fetching records from table {table.name}: {e}")
         return []
+
 
 # Fetch all records from the tables
 company_records = fetch_all_records(company_table)
@@ -105,19 +98,9 @@ def search_record_by_id(table, record_id):
 
 
 def sign_up_as_company(email, password, company_name):
-    """
-    Sign up a new company.
-
-    Args:
-        email (str): The company's email address.
-        password (str): The company's password.
-        company_name (str): The company's name.
-
-    Returns:
-        dict: The created company record if successful, None otherwise.
-    """
     try:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        logger.info(f"Hashed password for {email}")
         company_record = company_table.create({
             'email': email,
             'password': hashed_password.decode('utf-8'),
@@ -129,23 +112,16 @@ def sign_up_as_company(email, password, company_name):
         return None
 
 def login_as_company(email, password):
-    """
-    Log in as a company.
-
-    Args:
-        email (str): The company's email address.
-        password (str): The company's password.
-
-    Returns:
-        dict or None: The company record is an object if login is successful, None otherwise.
-    """
     try:
         companies_records = company_table.all(formula=f"{{email}} = '{email}'")
         if not companies_records:
+            logger.warning(f"No company found with email: {email}")
             return None
         company = companies_records[0]['fields']
         if bcrypt.checkpw(password.encode('utf-8'), company['password'].encode('utf-8')):
+            logger.info(f"Company logged in: {email}")
             return company
+        logger.warning(f"Invalid password for company: {email}")
         return None
     except Exception as e:
         logger.error(f"Error authenticating account '{email}': {e}")

@@ -1,12 +1,13 @@
 <!-- Import Jinja Macros -->
 {% from 'macros.html' import navbar, call_to_actions as actions %}
 
+
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Companies (for testing)</title>
+    <title>Veric</title>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="../static/css/style.css"> <!-- Include custom CSS -->
@@ -39,6 +40,7 @@
 </head>
 
 <body class="flex flex-col items-center justify-start min-h-screen">
+
     <!-- Header -->
     {% set nav_links = [
         { "href": "/login", "name": "Login" },
@@ -47,33 +49,18 @@
 
     {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
 
-    {{ navbar(logo=logo | safe, navlinks=nav_links) }}
+    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
-    <!-- Main Content -->
-    <main class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12">
-        <div class="space-y-8 w-full">
-            {% for company in company_records %}
-                <div class="shadow-sm flex flex-col items-start justify-center p-4 space-y-2 border border-gray-300 rounded-lg bg-white w-4/5">
-                    <code class="text-sm flex flex-col font-monospace p-2 rounded max-w-full">
-                        {
-                            {% for key, value in company.items() %}
-                                <div class='flex flex-row items-start justify-start space-x-2 ml-6 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto'>
-                                    <span>"{{ key }}"</span>: <span>{{ value | tojson | safe }}{% if not loop.last %},{% endif %}</span>
-                                </div>
-                            {% endfor %}
-                        }
-                    </code>
-                </div>
-            {% endfor %}
-        </div>
-    </main>
-
+ cxklkcvlkf
     <!-- Footer -->
     <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
         <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
         <p class="text-center text-gray-700">
             &copy; 2023 Veric. All rights reserved.
-        </p>
+        </p>        
     </footer>
+
+    <!-- External JavaScript -->
+    <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script> <!-- Include Font Awesome -->
 </body>
 </html>

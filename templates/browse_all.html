@@ -36,7 +36,14 @@
 </head>
 <body>
 <!--- HEADER --->
+    {% set nav_links = [
+        { "href": "/login", "name": "Login" },
+        { "href": "/sign-up", "name": "Sign up" },
+    ] %}
 
+    {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
+
+    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
 
 <!--- MAIN --->
