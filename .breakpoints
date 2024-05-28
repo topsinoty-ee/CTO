@@ -3,9 +3,17 @@
     "api.py": [
       {
         "id": "c9e284d5-9b2a-4c0c-9c01-dad99d1e6b25",
-        "line": 65,
-        "version": 1363,
-        "index": 1793
+        "line": 1,
+        "version": 1364,
+        "index": 0
+      }
+    ],
+    "templates/job_offers.html": [
+      {
+        "id": "139ec599-6cbb-4407-bf4f-24b84e0e519d",
+        "line": 54,
+        "version": 2958,
+        "index": 2119
       }
     ]
   }

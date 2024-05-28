@@ -46,30 +46,26 @@
 
     {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
-    
-<!--- MAIN --->
-<main>
-    <section class="w-full ">
-        <div class="flex flex-col w-2/3">
+<main class="w-full h-full flex-row">
+    <section class="w-2/3 h-full absolute gap-x-8 left-0">
+        <div class="flex flex-col w-full bg-white border border-2">
             {% for company in company_records %}
-                <form method="POST" action="/job-offers/{{company.id}}" class=> <!--- ret to homepage or company page? --->
+                <form method="POST" action="/job-offers/{{company.id}}"  class="flex-wrap p-8 w-full h-full gap-y-8 relative"> <!--- ret to homepage or company page? --->
 
-<!----------------------------------------------- ABOUT ------------------------------------------------>
-
-                    <label for="company_about">About</label>
+                    <label for="company_about" class="font-normal text-xl my-2">About</label>
                     <textarea
                       name="company_about"
+                      placeholder="Type here..."
                       id="{{ company.fields.About }}"
                       value="{{ company.fields.About }}"
-                      placeholder="Type here..."
                       rows="4"
                       required
-                        >
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
+                       >
                     </textarea>
             
-<!----------------------------------------------- CONTACT ------------------------------------------------>
 
-                    <label for="company_contact">Contact info</label>
+                    <label for="company_contact" class="font-normal text-xl my-2">Contact info</label>
                     <textarea
                       name="company_contact"
                       id="{{ company.fields.Contact }}"
@@ -77,42 +73,41 @@
                       placeholder="Type here..."
                       rows="4"
                       required
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
                         >
                     </textarea>
-
-<!----------------------------------------------- NAME ------------------------------------------------>
                     
-                    <label for="company_name">Name</label>
+                    <label for="company_name" class="font-normal text-xl my-2">Name</label>
                     <input
                       type="text"
                       name="company_name"
                       id="{{ company.fields.Name }}"
                       value="{{ company.fields.Name }}"
-                      placeholder="Type here..."
+                      placeholder="Type here..."t
                       required
+                      class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2 h-10"
                     >
 
-<!----------------------------------------------- POSITIONS ------------------------------------------------>
 
-                    <label for="company_applications">Positions</label> <!--- applications? 🤷‍♀️--->
-                    <select name="company_applications">
-                        {% for application_id in company.fields.Applications %}
+                    <label for="company_applications" class="font-normal text-xl my-2">Positions</label>
+                    <select name="company_applications" placeholder="Type here..." required  class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2 h-10">
+                        {% for application in company.fields.Applications %}
                         {% set application = search(application_id) %}
                             {% if application %}
-                                <option value="{{company.id}}" selected>
+                                <option value="{{ company.id }}" selected class="bg-white">
                                     {{ company.fields.Applications }}
                                 </option>
                             {% else %}
-                                <option value="{{company.id}}">
+                                <option value="{{ company.id }}" class="bg-white">
                                     {{ company.fields.Applications }}
                                 </option>
                             {% endif %}
                         {% endfor %}
                     </select>
 
-<!----------------------------------------------- BENEFITS ------------------------------------------------>
 
-                    <label for="company_benefits">Benefits</label>
+
+                    <label for="company_benefits" class="font-normal text-xl my-2">Benefits</label>
                     <textarea
                       type="text"
                       name="company_benefits"
@@ -120,12 +115,13 @@
                       value="{{ company.fields.Benefits }}"
                       placeholder="Type here..."
                       rows="2"
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
                       required
+                        >
                     </textarea>
 
-<!----------------------------------------------- EXPECTATIONS ------------------------------------------------>
 
-                    <label for="company_expectations">Expectations</label>
+                    <label for="company_expectations" class="font-normal text-xl my-2">Expectations</label>
                     <textarea
                       type="text"
                       name="company_expectations"
@@ -134,11 +130,12 @@
                       placeholder="Type here..."
                       rows="2"
                       required
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
+                        >
                     </textarea>
 
-<!----------------------------------------------- REQUIREMENTS ------------------------------------------------>
                     
-                    <label for="company_requirements">Requirements</label>
+                    <label for="company_requirements" class="font-normal text-xl my-2">Requirements</label>
                     <textarea
                       type="text"
                       name="company_requirements"
@@ -146,28 +143,28 @@
                       value="{{ company.fields.Requirements }}"
                       placeholder="Type here..."
                       required
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
+                        >
                     </textarea>
+                    
 
-<!----------------------------------------------- PAY ------------------------------------------------>
-
-                    <label for="company_salary">Salary</label> <!--- dropdown ? --->
-                    <select name="company_salary">
+                    <label for="company_salary" class="font-normal text-xl my-2">Salary</label>
+                    <select name="company_salary" placeholder="Type here..." required  class="block bg-white w-[calc(100%-8rem)]  my-2 rounded-md border border-gray-300 p-2 h-10">
                         {% for salary in company.fields.Salary %}
                             {% if salary %}
-                                <option value="{{company.id}}" selected>
+                                <option value="{{company.id}}" selected class="bg-white">
                                     {{ company.fields.Salary }}
                                 </option>
                             {% else %}
-                                <option value="{{company.id}}">
+                                <option value="{{company.id}}" class="bg-white">
                                     {{ company.fields.Salary }}
                                 </option>
                             {% endif %}
                         {% endfor %}
                     </select>
 
-<!----------------------------------------------- DESC ------------------------------------------------>
                     
-                    <label for="company_description">Description</label>
+                    <label for="company_description" class="font-normal text-xl my-2">Description</label>
                     <textarea
                       type="text"
                       name="company_description"
@@ -175,25 +172,21 @@
                       value="{{ company.fields.Description }}"
                       placeholder="Type here..."
                       required
+                        class="block bg-white w-[calc(100%-8rem)] my-2 rounded-md border border-gray-300 p-2"
+                        >
                     </textarea>
     
-    
-<!----------------------------------------------- SAVERET ------------------------------------------------>
-    
-                    <button>Save</button>
-                    <button>Return</button>
+                    <button class="bg-white border border-gray-300 rounded-md px-4 py-2 mt-6">Submit</button>
+                    <button class="bg-white border border-gray-300 rounded-md px-4 py-2 mt-6">Return</button>
                 </form>
             {%endfor%}
         </div>
     </section>
-    <section>
-        <img src="">
+    <section class="w-1/3 h-full absolute gap-x-8 right-0">
+        <div class="my-auto bg-yellow"></div>
     </section>
 </main>
 
-
-    
-<!--- FOOTER --->
 
 
 <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script> <!-- Include Font Awesome -->
