@@ -156,3 +156,16 @@ def login_as_company(email, password):
     except Exception as e:
         logger.error(f"Error authenticating account '{email}': {e}")
         return None
+
+
+def update_record(form_data, id):
+    """
+    Update the record in the airtable database.
+
+    Args:
+        form_data (dict): The form data to be updated.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
+    """
+    logger.info(form_data)

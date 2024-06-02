@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, redirect
 import os
+from logging import debug, getLogger, basicConfig, INFO
 from flask.helpers import url_for
-from api import (company_table, company_records, search_record_by_id, sign_up_as_company,
-                 login_as_company)
+from api import (company_table, company_records, applications_records,
+                 fetch_all_records, search_record_by_id, sign_up_as_company,
+                 login_as_company, update_record)
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.urandom(24)
+
+basicConfig(level=INFO)
+logger = getLogger(__name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -105,7 +110,8 @@ def all_companies():
 
     # Build the companies_data list using list comprehension
     companies_data = [{
-        f'company_{field.lower()}': company['fields'].get(field, '')
+        f'company_{field.lower()}':
+        company['fields'].get(field, '')
         for field in fields
     } for company in company_records]
 
@@ -157,7 +163,8 @@ def sign_up():
         password = request.form['password']
         company_name = request.form['company_name']
 
-        if not email.strip() and not password.strip() and not company_name.strip():
+        if not email.strip() and not password.strip(
+        ) and not company_name.strip():
             return render_template('sign_up.html',
                                    error='Please fill in all fields.')
         # Sign up as a company
@@ -240,7 +247,7 @@ def company_dashboard(company_id):
     return render_template('dashboard.html', company_data=company_data)
 
 
-@app.route('/company-dashboard/<company_id>/applications', methods=['GET'])
+@app.route('/company-dashboard/<company_id>/applications', methods=[ 'GET', 'POST' ])
 @login_required
 def company_applications(company_id):
     """
@@ -252,7 +259,16 @@ def company_applications(company_id):
     Returns:
         str: Rendered HTML template for the company's applications page.
     """
-    return render_template('applications.html', company_id=company_id)
+    if request.method == 'POST':
+        # Handle form submission logic here, if any
+        update_record(request.form, company_id)
+    company_applications = []
+    for record in applications_records:
+        if record['fields']['id'] == company_id:
+            company_applications.append(record['fields'])
+
+    return render_template('applications.html',
+                           applications=company_applications)
 
 
 @login_manager.unauthorized_handler
@@ -277,6 +293,15 @@ def logout():
     """
     logout_user()
     return redirect('/')
+
+
+@app.route('/edit/<id>/', methods = ['GET', 'POST'])
+@login_required
+def edit(id):
+    formdata = request.args('formdata')
+    if request.method == 'POST':
+        pass
+    return render_template('form.html', formdata=formdata)
 
 
 if __name__ == "__main__":

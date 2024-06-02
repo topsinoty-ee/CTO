@@ -1,7 +1,7 @@
 {% macro call_to_actions(action_list) %}
     {% for action in action_list %}
         <a href="{{ action.href }}" class="block w-full">
-            <button class="px-4 py-2 text-xl bg-content text-white rounded action-btn w-full hover:bg-content">
+            <button class="px-4 py-2 text-xl bg-content text-white rounded-2xl action-btn w-full hover:bg-content">
                 {{ action.name }}
             </button>
         </a>
@@ -10,7 +10,7 @@
 
 
 {% macro nav_link(navlink) %}
-    <li class="capitalize px-4 py-2 bg-content text-white rounded action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
+    <li class="capitalize px-4 py-2 bg-content text-white rounded-2xl action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
         <a class="h-full w-full" href="{{ navlink.href }}">{{ navlink.name }}</a>
     </li>
 {% endmacro %}
@@ -61,6 +61,35 @@
     {% for field in fields %}
       {{ render_field(field) }}
     {% endfor %}
-    <button type="submit" class="w-full text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2">Submit</button>
+    <button type="submit" class="w-full text-white py-2 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2">Submit</button>
   </form>
+{% endmacro %}
+
+
+{% macro add_to_formdata(field) %}
+    {{ {'name': field.key, 'label': field.name, 'type': field.type} }}
+{% endmacro %}
+
+{% macro card(data_source, displayed_fields, form_action, editable=False) %}
+    {% set form_data = [] %}
+    <div class="flex flex-col items-center justify-center p-4 space-y-2 border border-gray-300 rounded-lg bg-white w-4/5">
+        <code class="text-sm flex flex-col font-monospace p-2 rounded max-w-full">
+            {% for key, value in data_source.items() %}
+                {% for field in displayed_fields if field.key == key %}
+                    <div class="flex flex-row items-start justify-start space-x-2 ml-6 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto">
+                        <span>"{{ key }}"</span>: <span class="flex-grow overflow-auto">{{ value | tojson | safe }}{% if not loop.last %},{% endif %}</span>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </code>
+    </div>
+    {% if editable %}
+        {% for field in displayed_fields if field.editable %}
+            {% set form_data = form_data + [add_to_formdata(field)] %}
+        {% endfor %}
+        <form action="{{ url_for(form_action) }}" class="block w-full">
+          <button type="submit">Edit</button>
+        </form>
+
+    {% endif %}
 {% endmacro %}

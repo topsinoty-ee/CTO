@@ -1,5 +1,5 @@
     <!-- Import Jinja Macros -->
-    {% from 'macros.html' import navbar, call_to_actions as actions %}
+    {% from 'macros.html' import navbar, call_to_actions as actions, card %}
 
 
     <!DOCTYPE html>
@@ -55,22 +55,30 @@
         {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
     <main>
-    <div class="shadow-sm flex flex-col items-start justify-center p-4 space-y-2 border border-gray-300 rounded-lg bg-white w-4/5">
-        <code class="text-sm flex flex-col font-monospace p-2 rounded max-w-full">
-            
-                {% for key, value in company_data.items() %}
-                    <div class='flex flex-row items-start justify-start space-x-2 ml-6 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto'>
-                        <span>"{{ key }}"</span>: <span>{{ value | tojson | safe }}{% if not loop.last %},{% endif %}</span>
-                    </div>
-                {% endfor %}
-            
-        </code>
-    </div>
+        <div class="w-[40rem] mx-auto my-8">
+            {% set displayed_fields = [
+            { 
+                "name": "Company Name",
+                "editable" : True,
+                "key" : "name",
+                "type" : "text",
+            },
+            {
+                "name": "Company Email",
+                "editable": True,
+                "key": "email",
+                "type": "email",
+            }
+        ] %}
+        {{ card( data_source=company_data.fields, displayed_fields=displayed_fields, editable=True, form_action="/company-dashboard/" ~ company_data.id ~ "/applications")}}
+        </div>
+        
+
     </main>
 
             <!-- Footer -->
             <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
-                <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
+                <img src='../static/images/logo-white.svg' alt="Logo" class='w-16'/>
                 <p class="text-center text-gray-700">
                     &copy; {{current_year}} Veric. All rights reserved.
                 </p>        

@@ -1,7 +1,6 @@
 <!-- Import Jinja Macros -->
 {% from 'macros.html' import navbar, call_to_actions as actions %}
 
-
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
 <head>
@@ -20,26 +19,28 @@
 
     <!-- Tailwind Customization Script -->
     <script>
-        var tailwind = {
+        tailwind.config = {
             theme: {
-                colors: {
-                    content: '#386641',
-                    'logo-prime': '#6A994E',
-                    'logo-background': '#A7C957',
-                    background: '#E9F5DB',
-                    black: '#001000',
+                extend: {
+                    colors: {
+                        content: '#386641',
+                        'logo-prime': '#6A994E',
+                        'logo-background': '#A7C957',
+                        background: '#E9F5DB',
+                        black: '#001000',
+                    },
                 },
             },
             plugins: [
                 require('@tailwindcss/forms'),
-                require('tailwindcss-container-queries'),
+                require('@tailwindcss/container-queries'),
                 require('@tailwindcss/aspect-ratio')
             ],
         };
     </script>
 </head>
 
-<body class="flex flex-col items-center justify-start min-h-screen">
+<body class="flex flex-col items-center justify-start min-h-screen bg-background text-content">
 
     <!-- Header -->
     {% set nav_links = [
@@ -51,9 +52,21 @@
 
     {{ navbar(logo=logo|safe, navlinks=nav_links) }}
 
- cxklkcvlkf
+    <!-- Main Content -->
+    <main class="flex-grow w-full px-4 py-8">
+        {% for application in applications %}
+            <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+                {% for key, value in application.items() %}
+                    <div class="flex flex-row items-start justify-start space-x-2 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto">
+                        <span class="font-semibold">{{ key }}</span>: <span>{{ value | tojson | safe }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </main>
+
     <!-- Footer -->
-    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
+    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4 bg-logo-background text-black">
         <img src='../static/images/logo-black.svg' alt="Logo" class='w-16'/>
         <p class="text-center text-gray-700">
             &copy; 2023 Veric. All rights reserved.

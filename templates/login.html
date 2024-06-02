@@ -50,11 +50,13 @@
 
     {{ navbar(logo=logo|safe, navlinks=nav_links) }}
     <!-- Main Content -->
-    <main>
-          {{ render_form(url_for('login'), 'POST', [
-            {'id': 'email', 'name': 'email', 'type': 'email', 'placeholder': 'Email', 'required': True},
-            {'id': 'password', 'name': 'password', 'type': 'password', 'placeholder': 'Password', 'required': True},
-          ]) }}
+    <main class="h-full w-full relative mt-[8rem]">
+        <div class="mx-auto my-auto p-[8rem] border border-gray rounded-2xl absolute shadow-md">
+              {{ render_form(url_for('login'), 'POST', [
+                {'id': 'email', 'name': 'email', 'type': 'email', 'placeholder': 'Email', 'required': True},
+                {'id': 'password', 'name': 'password', 'type': 'password', 'placeholder': 'Password', 'required': True},
+              ]) }}
+        </div>
     </main>
 </body>
 </html>
