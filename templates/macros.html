@@ -66,30 +66,27 @@
 {% endmacro %}
 
 
-{% macro add_to_formdata(field) %}
-    {{ {'name': field.key, 'label': field.name, 'type': field.type} }}
-{% endmacro %}
-
-{% macro card(data_source, displayed_fields, form_action, editable=False) %}
+{% macro card(data_source, displayed_fields, data_source_table, editable=False) %}
     {% set form_data = [] %}
     <div class="flex flex-col items-center justify-center p-4 space-y-2 border border-gray-300 rounded-lg bg-white w-4/5">
         <code class="text-sm flex flex-col font-monospace p-2 rounded max-w-full">
             {% for key, value in data_source.items() %}
                 {% for field in displayed_fields if field.key == key %}
+                    {% if field.type == 'image' %}
+                        <span>Logo:</span><img src="{{ value[0]['url'] }}" alt="{{ value[0]['filename'] }}" class="w-full rounded-lg" />
+                    {% else %}
                     <div class="flex flex-row items-start justify-start space-x-2 ml-6 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto">
                         <span>"{{ key }}"</span>: <span class="flex-grow overflow-auto">{{ value | tojson | safe }}{% if not loop.last %},{% endif %}</span>
                     </div>
+                    {% endif %}
                 {% endfor %}
             {% endfor %}
         </code>
     </div>
     {% if editable %}
-        {% for field in displayed_fields if field.editable %}
-            {% set form_data = form_data + [add_to_formdata(field)] %}
-        {% endfor %}
-        <form action="{{ url_for(form_action) }}" class="block w-full">
-          <button type="submit">Edit</button>
+        <form action="/edit/{{data_source_table}}/{{data_source.id}}" method="post">
+            <input type="hidden" name="form_data" value="{{ displayed_fields }}">
+            <button type="submit">Edit</button>
         </form>
-
     {% endif %}
 {% endmacro %}

@@ -1,8 +1,10 @@
+from typing import List
 import bcrypt
 from logging import debug, getLogger, basicConfig, INFO
 import os
 from pyairtable import Api
 from pyairtable.api.table import Table
+from pyairtable.api.types import RecordDict, RecordId
 
 # Set up logging
 basicConfig(level=INFO)
@@ -14,6 +16,7 @@ BASE_KEY = os.environ.get('VERIC_BASE_KEY')
 COMPANY_TABLE_KEY = os.environ.get('COMPANY_TABLE_KEY')
 USERS_TABLE_KEY = os.environ.get('USERS_TABLE_KEY')
 APPLICATIONS_TABLE_KEY = os.environ.get('APPLICATIONS_TABLE_KEY')
+
 
 def check_env_vars():
     """
@@ -32,7 +35,9 @@ def check_env_vars():
 
     missing_vars = [key for key, value in required_vars.items() if not value]
     if missing_vars:
-        raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
+        raise ValueError(
+            f"Missing environment variables: {', '.join(missing_vars)}")
+
 
 # Check environment variables
 check_env_vars()
@@ -43,7 +48,8 @@ if API_KEY is None:
 # Initialize Airtable API client
 api = Api(API_KEY)
 
-def init_table(api, base_key, table_key):
+
+def init_table( table_key) -> Table:
     """
     Initialize a table.
 
@@ -55,14 +61,18 @@ def init_table(api, base_key, table_key):
     Returns:
         Table: The initialized table.
     """
-    return api.table(base_key, table_key)
+    if BASE_KEY is None:
+        raise ValueError("BASE_KEY environment variable is not set.")
+    return api.table(BASE_KEY, table_key)
+
 
 # Initialize tables
-company_table = init_table(api, BASE_KEY, COMPANY_TABLE_KEY)
-users_table = init_table(api, BASE_KEY, USERS_TABLE_KEY)
-applications_table = init_table(api, BASE_KEY, APPLICATIONS_TABLE_KEY)
+company_table = init_table(COMPANY_TABLE_KEY)
+users_table = init_table(USERS_TABLE_KEY)
+applications_table = init_table(APPLICATIONS_TABLE_KEY)
 
-def fetch_all_records(table):
+
+def fetch_all_records(table: Table):
     """
     Fetch all records from a given table.
 
@@ -80,36 +90,55 @@ def fetch_all_records(table):
         logger.error(f"Error fetching records from table {table.name}: {e}")
         return []
 
+
 # Fetch all records from the tables
 company_records = fetch_all_records(company_table)
 users_records = fetch_all_records(users_table)
 applications_records = fetch_all_records(applications_table)
 
-def search_record_by_id(table, record_id):
+
+def search_record_by_id(table: Table, record_id: str):
     """
-    Search for a record by ID in a specified table.
+    Search for a record by ID in a specified table. If not found in the specified table,
+    check other available tables.
 
     Args:
         table (Table): The table to search.
         record_id (str or list): The record ID(s) to search for.
 
     Returns:
-        dict or list: The record(s) found or None if an error occurred.
+        dict or list: The record(s) found or None if not found in any table or if an error occurred.
     """
     try:
         if isinstance(record_id, list):
-            records = [CRUD(table, record_id=id, option='read') for id in record_id]
+            records = [
+                CRUD(table, record_id=id, option='read') for id in record_id
+            ]
             return records
         elif isinstance(record_id, str):
-            return CRUD(table, record_id=record_id, option='read')
+            # Search in the specified table
+            record = CRUD(table, record_id=record_id, option='read')
+            if record:
+                return record
+            else:
+                # If not found in the specified table, check other available tables
+                available_tables = [company_table, users_table, applications_table]
+                for other_table in available_tables:
+                    if other_table != table:
+                        record = CRUD(other_table, record_id=record_id, option='read')
+                        if record:
+                            return record
+                # If not found in any table, return None
+                return None
         else:
-            raise ValueError("record_id must be either a string or a list of strings")
+            raise ValueError(
+                "record_id must be either a string or a list of strings")
     except Exception as e:
         logger.error(f"Error searching for record(s) with ID {record_id}: {e}")
         return None
 
 
-def sign_up_as_company(email, password, company_name):
+def sign_up_as_company(email: str, password: str, company_name: str):
     """
     Sign up a new company.
 
@@ -124,7 +153,8 @@ def sign_up_as_company(email, password, company_name):
     try:
         # Input validation
         if not email or not password or not company_name:
-            raise ValueError("Email, password, and company name must be provided.")
+            raise ValueError(
+                "Email, password, and company name must be provided.")
 
         # Check if the email is already in use
         existing_company = CRUD(company_table, option='read', record_id=email)
@@ -132,21 +162,21 @@ def sign_up_as_company(email, password, company_name):
             raise ValueError("A company with this email already exists.")
 
         # Hash the password
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'),
+                                        bcrypt.gensalt())
         logger.info(f"Hashed password for {email}")
 
         # Create the company record
-        company_record = CRUD(
-            table=company_table,
-            data={
-                'email': email,
-                'password': hashed_password.decode('utf-8'),
-                'name': company_name
-            },
-            option='create'
-        )
-
-        logger.info(f"Created company record with ID: {company_record['id']}")
+        company_record = CRUD(table=company_table,
+                              data={
+                                  'email': email,
+                                  'password': hashed_password.decode('utf-8'),
+                                  'name': company_name
+                              },
+                              option='create')
+        if company_record is not None:
+            logger.info(
+                f"Created company record with ID: {company_record['id']}")
         return company_record
 
     except ValueError as ve:
@@ -168,29 +198,28 @@ def login_as_company(email, password):
         dict: The authenticated company record, or None if authentication failed.
     """
     try:
-        # Search for company by email
-        formula = f"{{email}} = '{email}'"
-        companies_records = CRUD(company_table, data={'formula': formula}, option='read')
-
+        companies_records = company_table.all(formula=f"{{email}} = '{email}'")
         if not companies_records:
             logger.warning(f"No company found with email: {email}")
             return None
-
         company = companies_records[0]['fields']
-
-        # Check password
-        if bcrypt.checkpw(password.encode('utf-8'), company['password'].encode('utf-8')):
-            logger.info(f"Company logged in: {email}")
+        if bcrypt.checkpw(password.encode('utf-8'),
+                          company['password'].encode('utf-8')):
+            logger.info(
+                f"Company logged in: \"{company['id']}\" with account: \"{email}\""
+            )
             return company
-
         logger.warning(f"Invalid password for company: {email}")
         return None
     except Exception as e:
-        logger.error(f"Error authenticating account '{email}': {e}")
+        logger.error(f"Error logging in \"{email}\": {e}")
         return None
 
 
-def CRUD(table, record_id=None, data=None, option='read'):
+def CRUD(table: Table,
+         record_id: RecordId | None = None,
+         data: dict | None = None,
+         option: str = 'read') -> RecordDict | None:
     """
     Perform CRUD operations on a specified table.
 
@@ -204,36 +233,41 @@ def CRUD(table, record_id=None, data=None, option='read'):
         dict or None: The result of the CRUD operation, or None if an error occurred.
     """
     try:
-        if option == 'create':
+        if option == 'create' or option == 'POST':
             if data is None:
                 raise ValueError("Data must be provided to create a record.")
             record = table.create(data)
             logger.info(f"Created record with ID: {record['id']}")
             return record
 
-        elif option == 'read':
+        elif option == 'read' or option == 'GET':
             if record_id is None:
-                raise ValueError("Record ID must be provided to read a record.")
+                raise ValueError(
+                    "Record ID must be provided to read a record.")
             record = table.get(record_id)
             logger.info(f"Read record with ID: {record['id']}")
             return record
 
         elif option == 'update':
             if record_id is None or data is None:
-                raise ValueError("Record ID and data must be provided to update a record.")
+                raise ValueError(
+                    "Record ID and data must be provided to update a record.")
             record = table.update(record_id, data)
             logger.info(f"Updated record with ID: {record['id']}")
             return record
 
-        elif option == 'delete':
-            if record_id is None:
-                raise ValueError("Record ID must be provided to delete a record.")
-            table.delete(record_id)
-            logger.info(f"Deleted record with ID: {record_id}")
-            return {'status': 'deleted'}
+        # elif option == 'delete':
+        #     if record_id is None:
+        #         raise ValueError(
+        #             "Record ID must be provided to delete a record.")
+        #     table.delete(record_id)
+        #     logger.info(f"Deleted record with ID: {record_id}")
+        #     return {'status': 'deleted'}
 
         else:
-            raise ValueError("Invalid CRUD option provided. Choose from 'create', 'read', 'update', 'delete'.")
+            raise ValueError(
+                "Invalid CRUD option provided. Choose from 'create', 'read', 'update', 'delete'."
+            )
 
     except Exception as e:
         logger.error(f"Error during {option} operation: {e}")
