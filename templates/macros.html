@@ -8,7 +8,6 @@
     {% endfor %}
 {% endmacro %}
 
-
 {% macro nav_link(navlink) %}
     <li class="capitalize px-4 py-2 bg-content text-white rounded-2xl action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
         <a class="h-full w-full" href="{{ navlink.href }}">{{ navlink.name }}</a>
@@ -16,77 +15,87 @@
 {% endmacro %}
 
 {% macro navbar(logo, navlinks=[]) %}
- <header class="w-full h-20 shadow-sm flex items-center justify-between px-4 sticky top-0 z-999 nav-container">
-     <div class="flex items-center"> 
-       <a href='/'>
-         <!-- Logo or site title -->
-          {{ logo }}
-       </a>
-     </div>
-     <nav>
-         <ul class="flex items-center space-x-4">
-             {% for navlink in navlinks %}
-                {{ nav_link(navlink) }}
-             {% endfor %}
-         </ul>
-     </nav>
- </header>
+    <header class="w-full h-20 shadow-sm flex items-center justify-between px-4 sticky top-0 z-999 nav-container">
+        <div class="flex items-center"> 
+            <a href='/'>
+                <!-- Logo or site title -->
+                {{ logo }}
+            </a>
+        </div>
+        <nav>
+            <ul class="flex items-center space-x-4">
+                {% for navlink in navlinks %}
+                    {{ nav_link(navlink) }}
+                {% endfor %}
+            </ul>
+        </nav>
+    </header>
 {% endmacro %}
 
-
 {% macro render_field(field) %}
-  <div class="mb-4">
-    <label for="{{ field.id }}" class="block text-sm font-medium ">{{ field.label }}</label>
-    {% if field.type == 'dropdown' %}
-      <select id="{{ field.id }}" name="{{ field.name }}" class="pt-1 block w-full  rounded-md shadow-sm ">
-        {% for option in field.options %}
-          <option value="{{ option.value }}">{{ option.label }}</option>
-        {% endfor %}
-      </select>
-    {% else %}
-      <input id="{{ field.id }}" type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value }}" placeholder="{{ field.placeholder }}" {% if field.required %}required{% endif %} class="pt-1 block w-full rounded-md shadow-sm ">
-    {% endif %}
-    {% if field.errors %}
-      <ul class="pt-1 text-sm text-red-600">
-        {% for error in field.errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </div>
+    <div class="mb-4 p-1 border border-content rounded-xl">
+        <label for="{{ field.id }}" class="block text-sm font-medium ">{{ field.label }}</label>
+        {% if field.type == 'dropdown' %}
+            <select id="{{ field.id }}" name="{{ field.name }}" class="pt-1 block w-full  rounded-md shadow-sm ">
+                {% for option in field.options %}
+                    <option value="{{ option.value }}">{{ option.label }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input id="{{ field.id }}" type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value }}" 
+                placeholder="{{ field.placeholder }}" 
+                {% if field.required %}required{% endif %} 
+                class="pt-1 block w-full rounded-md"
+                >
+        {% endif %}
+        {% if field.errors %}
+            <ul class="pt-1 text-sm text-red-600">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 {% endmacro %}
 
 {% macro render_form(action, method, fields) %}
-  <form action="{{action}}" method="{{method}}">
-    {% for field in fields %}
-      {{ render_field(field) }}
-    {% endfor %}
-    <button type="submit" class="w-full text-white py-2 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2">Submit</button>
-  </form>
+    <form action="{{action}}" method="{{method}}">
+        {% for field in fields %}
+            {{ render_field(field) }}
+        {% endfor %}
+        <button type="submit" class="w-full text-white bg-content py-2 px-4 rounded-2xl focus:outline-none action-btn focus:ring-2 bg-content focus:ring-offset-2">Submit</button>
+    </form>
 {% endmacro %}
 
-
-{% macro card(data_source, displayed_fields, data_source_table, editable=False) %}
+{% macro card(data_source, displayed_fields, data_source_table, editable=False, image=False) %}
     {% set form_data = [] %}
-    <div class="flex flex-col items-center justify-center p-4 space-y-2 border border-gray-300 rounded-lg bg-white w-4/5">
-        <code class="text-sm flex flex-col font-monospace p-2 rounded max-w-full">
-            {% for key, value in data_source.items() %}
-                {% for field in displayed_fields if field.key == key %}
-                    {% if field.type == 'image' %}
-                        <span>Logo:</span><img src="{{ value[0]['url'] }}" alt="{{ value[0]['filename'] }}" class="w-full rounded-lg" />
-                    {% else %}
-                    <div class="flex flex-row items-start justify-start space-x-2 ml-6 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto">
-                        <span>"{{ key }}"</span>: <span class="flex-grow overflow-auto">{{ value | tojson | safe }}{% if not loop.last %},{% endif %}</span>
+    <div class="flex flex-col items-start justify-center p-4 space-y-4 border border-gray-300 rounded-lg bg-white w-4/5">
+        {% for key, value in data_source.items() %}
+            {% for field in displayed_fields if field.key == key %}
+                {% if field.type == 'image' and image %}
+                    <div class="flex flex-col items-start justify-start space-y-2 py-1">
+                        <span class="font-semibold text-gray-700">Logo:</span>
+                        {% if value and value[0]['url'] %}
+                            <img src="{{ value[0]['url'] }}" alt="{{ value[0]['filename'] }}" class="w-full rounded-lg" />
+                        {% else %}
+                            {% if editable %}
+                                <input type="file" name="image_upload" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    {% endif %}
-                {% endfor %}
+                {% else %}
+                    <div class="flex flex-row items-start justify-start space-x-2 py-1 w-full">
+                        <span class="font-semibold text-gray-700">{{ key }}:</span>
+                        <span class="flex-grow overflow-auto text-gray-600">{{ value | tojson | safe }}</span>
+                    </div>
+                {% endif %}
             {% endfor %}
-        </code>
+        {% endfor %}
     </div>
     {% if editable %}
-        <form action="/edit/{{data_source_table}}/{{data_source.id}}" method="post">
+        <form action="/edit/{{ data_source_table }}/{{ data_source.id }}" method="post" enctype="multipart/form-data" class="mt-4">
             <input type="hidden" name="form_data" value="{{ displayed_fields }}">
-            <button type="submit">Edit</button>
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg">Edit</button>
         </form>
     {% endif %}
 {% endmacro %}

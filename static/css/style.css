@@ -1,7 +1,6 @@
-@font-face{
-  font-family: 'j-sans';
-  src:
-    url("../fonts/JosefinSans-Regular.ttf") format("truetype"),
+@font-face {
+  font-family: "j-sans";
+  src: url("../fonts/JosefinSans-Regular.ttf") format("truetype"),
     url("../fonts/JosefinSans-Bold.ttf") format("truetype"),
     url("../fonts/JosefinSans-Italic.ttf") format("truetype"),
     url("../fonts/JosefinSans-BoldItalic.ttf") format("truetype"),
@@ -14,9 +13,9 @@
   padding: 0;
 }
 
-:root{
-  --content: #52CE8A;
-  --logo-prime: #6A994E;
+:root {
+  --content: #52ce8a;
+  --logo-prime: #6a994e;
   --logo-background: #1aad75;
   --background: #ffffff;
   --black: #001000;
@@ -28,51 +27,46 @@
 }
  */
 
-
-body{
-  font-family: 'j-sans', sans-serif;
+body {
+  font-family: "j-sans", sans-serif;
   margin: 0;
   color: var(--black) !important;
   background-color: var(--background) !important;
 }
 
-::selection{
+::selection {
   /*background-color: var(--logo-prime);
   color: var(--background);*/
   /* font-weight: bold;
   padding: 0.2rem 0.325rem; */
 }
 
-.logo-container{
-  
+.logo-container {
 }
 
-.logo-container .logo{
+.logo-container .logo {
   color: var(--logo-prime);
   user-select: none;
   cursor: pointer;
 }
 
-.nav-container{
+.nav-container {
   background-color: var(--background) !important;
 }
 
-.navlinks{
-  
+.navlinks {
 }
 
-.navlink{
-  
+.navlink {
 }
 
-.action-btn{
+.action-btn {
   background-color: var(--content);
 }
 
-.action-btn:hover{
+.action-btn:hover {
   background-color: var(--logo-background);
 }
 
-footer{
-  
+footer {
 }

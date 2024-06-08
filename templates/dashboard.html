@@ -3,81 +3,82 @@
 
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Veric</title>
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="../static/css/style.css"> <!-- Include custom CSS -->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Include Tailwind CSS -->
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <!-- Include custom CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Tailwind CSS -->
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet"> <!-- Include Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Include Google Fonts -->
 
     <!-- Tailwind Customization Script -->
     <script>
-        var tailwind = {
-            theme: {
-                colors: {
-                    content: '#386641',
-                    'logo-prime': '#6A994E',
-                    'logo-background': '#A7C957',
-                    background: '#E9F5DB',
-                    black: '#001000',
-                },
-            },
-            plugins: [
-                require('@tailwindcss/forms'),
-                require('tailwindcss-container-queries'),
-                require('@tailwindcss/aspect-ratio')
-            ],
-        };
+      var tailwind = {
+        theme: {
+          colors: {
+            content: "#386641",
+            "logo-prime": "#6A994E",
+            "logo-background": "#A7C957",
+            background: "#E9F5DB",
+            black: "#001000",
+          },
+        },
+        plugins: [
+          require("@tailwindcss/forms"),
+          require("tailwindcss-container-queries"),
+          require("@tailwindcss/aspect-ratio"),
+        ],
+      };
     </script>
-</head>
+  </head>
 
-<body class="flex flex-col items-center justify-start min-h-screen">
-
+  <body class="flex flex-col items-center justify-start min-h-screen">
     <!-- Header -->
-    {% set nav_links = [
-        { "href": "/company-dashboard/" ~ company_data.id ~ "/applications", "name": "Applications" },
-        { "href": "/logout", "name": "Logout" }
-    ] %}
-
-    {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
-
-    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+    {% set nav_links = [ { "href": "/applications/" ~ company_data.id, "name":
+    "Applications" }, { "href": "/logout", "name": "Logout" } ] %} {% set logo =
+    '<span class="text-3xl font-bold text-gray-800">Veric</span>' %} {{
+    navbar(logo=logo|safe, navlinks=nav_links) }}
 
     <main>
-        <div class="w-[40rem] mx-auto my-8">
-            {% set displayed_fields = [
-                { "name": "id", "key": "id", "type": "text", "editable": False },
-                { "name": "Company Name", "editable": True, "key": "name", "type": "text" },
-                { "name": "Company Email", "editable": True, "key": "email", "type": "email" },
-                { "name": "Company Phone Number", "editable": True, "key": "contact", "type": "tel" },
-                { "name": "Logo", "editable": True, "key": "logo", "type": "image" },
-            ] %}
-
-            {{ card(
-                data_source=company_data.fields,
-                displayed_fields=displayed_fields,
-                editable=True,
-                data_source_table=table
-            ) }}
-        </div>
+      <div class="w-[40rem] mx-auto my-8">
+        {% set displayed_fields = [ { "name": "id", "key": "id", "type": "text",
+        "editable": False }, { "name": "Company Name", "editable": True, "key":
+        "name", "type": "text" }, { "name": "Company Email", "editable": True,
+        "key": "email", "type": "email" }, { "name": "Company Phone Number",
+        "editable": True, "key": "contact", "type": "tel" }, { "name": "Logo",
+        "editable": True, "key": "logo", "type": "image" }, ] %} {{ card(
+        data_source=company_data.fields, displayed_fields=displayed_fields,
+        editable=True, data_source_table=table, image=True ) }}
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
-        <img src='../static/images/logo-white.svg' alt="Logo" class='w-16'/>
-        <p class="text-center text-gray-700">
-            &copy; {{current_year}} Veric. All rights reserved.
-        </p>
+    <footer
+      class="h-40 flex flex-col items-center justify-center w-full space-y-4"
+    >
+      <img src="../static/images/logo-white.svg" alt="Logo" class="w-16" />
+      <p class="text-center text-gray-700">
+        &copy; {{current_year}} Veric. All rights reserved.
+      </p>
     </footer>
 
     <!-- External JavaScript -->
-    <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script> <!-- Include Font Awesome -->
-</body>
+    <script
+      src="https://kit.fontawesome.com/68c16b630a.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Include Font Awesome -->
+  </body>
 </html>

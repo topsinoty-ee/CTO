@@ -1,19 +1,15 @@
 from flask import Flask, render_template, request, redirect
 import os
-from logging import debug, getLogger, basicConfig, INFO
 from flask.helpers import url_for
-from api import (CRUD, company_table, company_records, applications_records,
-                 fetch_all_records, init_table, search_record_by_id,
-                 sign_up_as_company, login_as_company, COMPANY_TABLE_KEY)
+from api.utils import convert_to_json, CRUD
+from api.logging_config import logger
+from api.airtable_ops import company_records, company_table, applications_records, init_table, search_record_by_id
+from api.auth import sign_up_as_company, login_as_company
+from api.env_config import COMPANY_TABLE_KEY
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-import json
-import re
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.urandom(24)
-
-basicConfig(level=INFO)
-logger = getLogger(__name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -267,10 +263,7 @@ def company_applications(company_id):
     if request.method == 'POST':
         # Handle form submission logic here, if any
         pass
-    company_applications = []
-    for record in applications_records:
-        if record['fields']['id'] == company_id:
-            company_applications.append(record['fields'])
+    
 
     return render_template('applications.html',
                            applications=company_applications)
@@ -324,54 +317,34 @@ def edit(table, id):
 
 @app.route('/update/<table_key>/<id>', methods=['POST'])
 @login_required
-def updaterecord(table_key, id):
+def update_record(table_key, id):
     try:
-        data = request.form.to_dict()
-
-        # Create a list of keys to remove
-        keys_to_remove = []
-        for key, value in data.items():
-            if value == "":
-                keys_to_remove.append(key)
-
-        # Remove the keys with empty values
-        for key in keys_to_remove:
-            del data[key]
-
-        # Remove the 'id' field from the data dictionary
+        data = {
+            key: value
+            for key, value in request.form.items() if value.strip() != ""
+        }
         data.pop('id', None)
+        files = request.files.to_dict()
 
-        logger.info(data)
+        logger.info(f"data: {data}")
+        logger.info(f"files: {files}")
 
         Table = init_table(table_key)
-        CRUD(Table, record_id=id, data=data, option='update')
+        CRUD(Table, record_id=id, data=data, files=files, option='update')
         return redirect(f'/company-dashboard/{current_user.id}')
     except Exception as e:
-        logger.error(f"Error updating record with ID {id} in table {table_key}: {e}")
+        logger.error(
+            f"Error updating record with ID {id} in table {table_key}: {e}")
         return "An error occurred", 500
 
 
-
-def convert_to_json(input_string):
-    """
-    Converts a string to a valid JSON string.
-
-    Args:
-        input_string (str): A string.
-
-    Returns:
-        str: A valid JSON string.
-    """
-    # Replace single quotes with double quotes
-    json_string = input_string.replace("'", '"')
-    json_string = re.sub(r'\bTrue\b', 'true', json_string)
-    json_string = re.sub(r'\bFalse\b', 'false', json_string)
-    json_string = re.sub(r'\bNone\b', 'null', json_string)
-    try:
-        json_obj = json.loads(json_string)
-        return json_obj
-    except json.JSONDecodeError as e:
-        return (f"Invalid JSON string: {e}")
+@app.route('/add/<table_key>', methods=['GET', 'POST'])
+@login_required
+def add_record(table_key):
+    return render_template('form.html',
+                           table=table_key,
+                           data=record,
+                           formdata=displayed_data)
 
 
 if __name__ == "__main__":
