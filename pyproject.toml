@@ -8,6 +8,13 @@ authors = ["Your Name <you@example.com>"]
 python = ">=3.10.0,<3.12"
 flask = "^3.0.3"
 pyairtable = "^2.3.3"
+bcrypt = "^4.1.3"
+flask-login = "^0.6.3"
+logger = "^1.4"
+dropbox = "^12.0.2"
+werkzeug = "^3.0.3"
+api = "^0.0.7"
+requests = "^2.32.3"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

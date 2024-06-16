@@ -1,0 +1,85 @@
+<!-- Import Jinja Macros -->
+{% from 'macros.html' import navbar, call_to_actions as actions %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="wireframe">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Veric</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <!-- Include custom CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Tailwind CSS -->
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Include Google Fonts -->
+
+    <!-- Tailwind Customization Script -->
+    <script>
+      var tailwind = {
+        theme: {
+          colors: {
+            content: "#386641",
+            "logo-prime": "#6A994E",
+            "logo-background": "#A7C957",
+            background: "#E9F5DB",
+            black: "#001000",
+          },
+        },
+        plugins: [
+          require("@tailwindcss/forms"),
+          require("tailwindcss-container-queries"),
+          require("@tailwindcss/aspect-ratio"),
+        ],
+      };
+    </script>
+  </head>
+
+  <body class="flex flex-col items-center justify-start min-h-screen">
+    <!-- Header -->
+    {% set nav_links = [ { "href": "/login", "name": "Login" }, { "href":
+    "/sign-up", "name": "Sign up" }, ] %} {% set logo = '<span
+      class="text-3xl font-bold text-gray-800"
+      >Veric</span
+    >' %} {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+
+    <!-- Main Content -->
+    <main
+      class="w-full flex flex-col items-center justify-center p-8 space-y-8 lg:px-12"
+    >
+      <section class="w-full flex items-center justify-between">
+        <div class="flex flex-col items-start justify-center space-y-4">
+          {% set actions_list = [ {'name': "Home", 'href': "/"}, {'name': "View
+          all companies", 'href': "/all-companies"}, {'name': "Browse All
+          Hires", 'href': "/browse-all"} ] %} {{ actions(actions_list) }}
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="h-40 flex flex-col items-center justify-center w-full space-y-4"
+    >
+      <img src="../static/images/logo-black.svg" alt="Logo" class="w-16" />
+      <p class="text-center text-gray-700">
+        &copy; 2023 Veric. All rights reserved.
+      </p>
+    </footer>
+
+    <!-- External JavaScript -->
+    <script
+      src="https://kit.fontawesome.com/68c16b630a.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Include Font Awesome -->
+  </body>
+</html>
