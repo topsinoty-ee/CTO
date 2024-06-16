@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 import os
 from flask.helpers import url_for
 from api.utils import convert_to_json, CRUD
 from api.logging_config import logger
-from api.airtable_ops import company_records, company_table, applications_records, init_table, search_record_by_id
+from api.airtable_ops import (company_records, company_table,
+                              applications_table, init_table,
+                              search_record_by_id)
 from api.auth import sign_up_as_company, login_as_company
-from api.env_config import COMPANY_TABLE_KEY
+from api.env_config import APPLICATIONS_TABLE_KEY, COMPANY_TABLE_KEY
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -263,10 +265,24 @@ def company_applications(company_id):
     if request.method == 'POST':
         # Handle form submission logic here, if any
         pass
-    
 
-    return render_template('applications.html',
-                           applications=company_applications)
+    company_data = search_record_by_id(company_table, company_id)
+    applications_data = []
+    all_company_application_ids = company_data['fields'].get(
+        'applications', [])
+
+    for application_id in all_company_application_ids:
+        application_data = search_record_by_id(applications_table,
+                                               application_id)
+        applications_data.append(application_data)
+
+    logger.info(applications_data)
+    return render_template(
+        'applications.html',
+        data=applications_data,
+        table=APPLICATIONS_TABLE_KEY,
+        is_addable=True,  # Adjust as per your requirements
+        current_user=current_user.id)
 
 
 @login_manager.unauthorized_handler
@@ -277,7 +293,7 @@ def unauthorized():
     Returns:
         Redirect: Redirects the user to the login page with a 'next' parameter.
     """
-    return redirect(url_for('login', next=request.endpoint))
+    return redirect(url_for('login', next=request.path.strip('/')))
 
 
 @app.route('/logout')
@@ -307,18 +323,24 @@ def edit(table, id):
             displayed_data = convert_to_json(form_data)
         # Process the displayed_data as needed
         logger.info(f"Edited data: {displayed_data}")
-        return render_template('form.html',
+        return render_template('update_form.html',
                                formdata=displayed_data,
                                data=record,
                                table=table)
 
-    return render_template('form.html', formdata=displayed_data)
+    return render_template('update_form.html',
+                           formdata=displayed_data,
+                           is_edit=True)
 
 
 @app.route('/update/<table_key>/<id>', methods=['POST'])
 @login_required
-def update_record(table_key, id):
+def update_record(table_key: str, id):
     try:
+        Table = init_table(table_key)
+        record = search_record_by_id(Table, id)
+        logger.info(record)
+        # write logic that compare
         data = {
             key: value
             for key, value in request.form.items() if value.strip() != ""
@@ -329,7 +351,6 @@ def update_record(table_key, id):
         logger.info(f"data: {data}")
         logger.info(f"files: {files}")
 
-        Table = init_table(table_key)
         CRUD(Table, record_id=id, data=data, files=files, option='update')
         return redirect(f'/company-dashboard/{current_user.id}')
     except Exception as e:
@@ -338,13 +359,93 @@ def update_record(table_key, id):
         return "An error occurred", 500
 
 
-@app.route('/add/<table_key>', methods=['GET', 'POST'])
+@app.route('/add/<table>', methods=['GET', 'POST'])
 @login_required
-def add_record(table_key):
-    return render_template('form.html',
-                           table=table_key,
-                           data=record,
-                           formdata=displayed_data)
+def add_record(table: str):
+    displayed_data = []
+
+    if request.method == 'POST':
+        form_data = request.form['form_data']
+        computed_field = request.form['computed_field']
+
+        if form_data is not None:
+            logger.info(f"form_data: {form_data}")
+            displayed_data = convert_to_json(form_data)
+            displayed_data = [
+                field for field in displayed_data if field['editable']
+            ]
+
+            logger.info(f"Data to add: {displayed_data}")
+            return render_template('add_form.html',
+                                   formdata=displayed_data,
+                                   table=table,
+                                   computed_field=computed_field)
+
+    return render_template('add_form.html',
+                           formdata=displayed_data,
+                           table=table)
+
+
+@app.route('/create/<table>', methods=['POST'])
+@login_required
+def create_record(table: str):
+    try:
+        Table = init_table(table)
+
+        # Get form data and log it
+        formdata = request.form.items()
+        computed_field = request.form.get('computed_field')
+        logger.info(f"computed_field: {computed_field}")
+        logger.info(f"formdata: {formdata}")
+
+        # Parse the computed_field JSON string into a Python dictionary
+        computed_field_data = convert_to_json(computed_field)
+        logger.info(f"computed_field_data: {computed_field_data}")
+
+        # Add form data to the data dictionary, excluding the computed field initially
+        data = {
+            key: value
+            for key, value in formdata if key != 'computed_field'
+        }
+        logger.info(f"data: {data}")
+        # Add the computed field to the data dictionary
+        if 'key' in computed_field_data and 'value' in computed_field_data:
+            data[computed_field_data['key']] = [computed_field_data['value']]
+        logger.info(f"data after adding computed_field: {data}")
+
+        # Get files and log them
+        files = request.files.to_dict()
+        logger.info(f'files: {files}')
+
+        # Use CRUD function to create the record
+        CRUD(Table, data=data, files=files, option='create')
+
+        # Redirect to the company dashboard
+        return redirect(f'/company-dashboard/{current_user.id}')
+
+    except Exception as e:
+        logger.error(f"Error adding record to table {table}: {e}")
+        return "An error occurred", 500
+
+
+@app.route('/delete/<table>/<item_id>', methods=['POST'])
+@login_required
+def delete_item(table, item_id):
+    """
+    Delete an item from the specified table.
+
+    Args:
+        table (str): The table from which to delete the item.
+        item_id (str): The ID of the item to delete.
+
+    Returns:
+        str: Redirect to the applications page after deletion.
+    """
+    Table = init_table(table)
+    CRUD(Table, item_id, option='delete')
+    flash('Item deleted successfully', 'success')
+    return redirect(url_for('company_applications',
+                            company_id=current_user.id))
 
 
 if __name__ == "__main__":

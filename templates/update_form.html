@@ -61,33 +61,32 @@
       >
         {% for field in formdata %}
         <label for="{{ field.key }}">
-          {{ field.name }} {% if field.type == 'image' %}
-          <input
-            type="file"
-            id="{{ field.key }}"
-            name="{{ field.key }}"
-            class="mt-1 block w-full"
-          />
+          {{ field.name }} 
+          {% if field.type == 'image' %}
+            {% if field.editable %}
+              <input
+                type="file"
+                id="{{ field.key }}"
+                name="{{ field.key }}"
+                class="mt-1 block w-full"
+              />
+            {% else %}
+              <img src="{{ data.fields[field.key][0]['url'] }}"/>
+            {% endif %}
           {% else %}
-          <input
-            name="{{ field.key }}"
-            id="{{ field.key }}"
-            type="{{ field.type }}"
-            class="mt-1 block w-full"
-            {%
-            if
-            field.editable
-            %}
-            placeholder="{{ data.fields[field.key] }}"
-            {%
-            else
-            %}
-            readonly="true"
-            value="{{ data.fields[field.key] }}"
-            {%
-            endif
-            %}
-          />
+            {% if field.editable %}
+              <input
+                name="{{ field.key }}"
+                id="{{ field.key }}"
+                type="{{ field.type }}"
+                class="mt-1 block w-full"
+                value="{{ data.fields[field.key] }}"
+              />
+            {% else %}
+              <div>
+                <span>{{ field.key }}</span>: <span>{{ data.fields[field.key] }}</span>
+              </div>
+            {% endif %}
           {% endif %}
         </label>
         {% endfor %}

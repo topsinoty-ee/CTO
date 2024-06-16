@@ -1,5 +1,5 @@
 <!-- Import Jinja Macros -->
-{% from 'macros.html' import navbar, call_to_actions as actions %}
+{% from 'macros.html' import navbar, call_to_actions as actions, list %}
 
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
@@ -58,18 +58,29 @@
 
     <!-- Main Content -->
     <main class="flex-grow w-full px-4 py-8">
-      {% for application in applications %}
-      <div class="bg-white shadow-md rounded-lg p-4 mb-4">
-        {% for key, value in application.items() %}
-        <div
-          class="flex flex-row items-start justify-start space-x-2 py-1 border-gray-300 {% if not loop.last %}border-b{% endif %} select-auto"
-        >
-          <span class="font-semibold">{{ key }}</span>:
-          <span>{{ value | tojson | safe }}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% endfor %}
+      {% set displayed_fields = [
+        {"name" : "id", "key" : "id", "type" : "text", "editable" : False },
+        {"name": "Application name", "editable": True, "key": "jobName", "type": "text"},
+        {"name": "Posted by", "editable": False, "key": "companyName", "type": "text"},
+        {"name": "Role", "editable": False, "key": "role", "type": "checkbox"},
+        {"name": "Logo", "editable": False, "key": "logo", "type": "image"},
+      ]%}
+      {% set user_id = current_user %}
+      {% set computed_field = {
+        "key": "company",
+        "value": user_id
+      }%}
+
+      {{ list( 
+        data=data,
+        fields=displayed_fields,
+        is_editable=True,
+        table=table,
+        has_image=True,
+        is_addable=True,
+        is_deletable=True,
+        computed_field=computed_field
+      )}}
     </main>
 
     <!-- Footer -->

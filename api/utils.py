@@ -1,11 +1,11 @@
-from .dropbox_ops import upload_file
+from .Dropbox.dropbox_ops import upload_file
 from .logging_config import logger
 import re
 import json
 
 
 def CRUD(table,
-         record_id = None,
+         record_id=None,
          data=None,
          files=None,
          option: str = 'read'):
@@ -43,6 +43,7 @@ def CRUD(table,
 
             # Merge data and file links
             data_with_files = {**data, **uploaded_files}
+            logger.info(f"Data with files: {data_with_files}")
 
             if option.lower() in ['create', 'post']:
                 record = table.create(data_with_files)
