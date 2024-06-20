@@ -9,7 +9,7 @@
 {% endmacro %}
 
 {% macro nav_link(navlink) %}
-    <li class="capitalize px-4 py-2 bg-content text-white rounded-2xl action-btn hover:bg-content select-none item-center justify-center cursor-pointer">
+    <li class="capitalize px-4 py-2 bg-content text-white rounded-2xl action-btn hover:bg-content select-none item-center justify-center cursor-pointer" data-is-button>
         <a class="h-full w-full" href="{{ navlink.href }}">{{ navlink.name }}</a>
     </li>
 {% endmacro %}
