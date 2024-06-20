@@ -4,8 +4,10 @@ from api.airtable_ops import (
 )
 from flask_login import current_user
 from flask import (redirect, render_template, request, flash)
-from api.logging_config import logger
+from api.logging_config import logging
 from api.utils import convert_to_json, CRUD
+
+logger = logging.getLogger(__name__)
 
 
 def edit(table, id):

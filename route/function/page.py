@@ -3,7 +3,9 @@ from flask import redirect, render_template, request
 from api.airtable_ops import (APPLICATIONS_TABLE_KEY, applications_table,
                               search_record_by_id, fetch_all_records,
                               company_table, COMPANY_TABLE_KEY)
-from api.logging_config import logger
+from api.logging_config import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Home page

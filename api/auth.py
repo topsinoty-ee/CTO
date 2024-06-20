@@ -1,7 +1,10 @@
 from .utils import CRUD
-from .airtable_ops import company_table
+from .airtable_ops import company_table, fetch_all_records
 import bcrypt
-from .logging_config import logger
+from .logging_config import logging
+
+logger = logging.getLogger(__name__)
+
 
 def sign_up_as_company(email: str, password: str, company_name: str):
     """
@@ -16,15 +19,19 @@ def sign_up_as_company(email: str, password: str, company_name: str):
         dict: The created company record, or None if an error occurred.
     """
     try:
-        # Input validation
         if not email or not password or not company_name:
             raise ValueError(
                 "Email, password, and company name must be provided.")
 
-        # Check if the email is already in use
-        existing_company = CRUD(company_table, option='read', record_id=email)
-        if existing_company:
-            raise ValueError("A company with this email already exists.")
+        # Check if email already exists
+        all_emails = [
+            company['fields'].get('email')
+            for company in fetch_all_records(company_table)
+        ]
+        if email in all_emails:
+            raise ValueError(
+                "A company with this email already exists. Please try another email."
+            )
 
         # Hash the password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'),

@@ -1,9 +1,10 @@
 from .Dropbox.dropbox_ops import upload_file
-from .logging_config import logger
+from .logging_config import logging
 import re
 import json
 from typing import Optional, Dict, Any
 
+logger = logging.getLogger(__name__)
 
 
 def CRUD(table, record_id: Optional[str] = None, data: Optional[Dict[str, Any]] = None, 

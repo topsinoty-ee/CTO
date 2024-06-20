@@ -58,5 +58,10 @@
       'company_name', 'type': 'text', 'placeholder': 'Company Name', 'required':
       True} ]) }}
     </main>
+    <script>
+      {% if email_taken %}
+        alert("Email already exists");
+      {% endif %}
+    </script>
   </body>
 </html>

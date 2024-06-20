@@ -36,7 +36,7 @@ def sign_up():
             return redirect(f'/{company_id}/company-dashboard')
         else:
             # Handle sign-up failure
-            return "Sign up failed"
+            return render_template('sign_up.html', email_taken=True)
     return render_template('sign_up.html')
 
 

@@ -1,24 +1,19 @@
 from pyairtable import Api
 from pyairtable.api.table import Table
-from .env_config import (
-    API_KEY,
-    BASE_KEY,
-    COMPANY_TABLE_KEY,
-    USERS_TABLE_KEY,
-    APPLICATIONS_TABLE_KEY
-)
-from .logging_config import logger
+from .env_config import (API_KEY, BASE_KEY, COMPANY_TABLE_KEY, USERS_TABLE_KEY,
+                         APPLICATIONS_TABLE_KEY)
+from .logging_config import logging
 from .utils import CRUD
 
+logger = logging.getLogger(__name__)
 
 if API_KEY is None:
     raise ValueError("API_KEY environment variable is not set.")
 
-# Initialize Airtable API client
 api = Api(API_KEY)
 
 
-def init_table( table_key) -> Table:
+def init_table(table_key) -> Table:
     """
     Initialize a table.
 
@@ -33,8 +28,6 @@ def init_table( table_key) -> Table:
     if BASE_KEY is None:
         raise ValueError("BASE_KEY environment variable is not set.")
     return api.table(BASE_KEY, table_key)
-
-
 
 
 def fetch_all_records(table: Table):
@@ -75,19 +68,20 @@ def search_record_by_id(table: Table, record_id: str):
             ]
             return records
         elif isinstance(record_id, str):
-            # Search in the specified table
             record = CRUD(table, record_id=record_id, option='read')
             if record:
                 return record
             else:
-                # If not found in the specified table, check other available tables
-                available_tables = [company_table, users_table, applications_table]
+                available_tables = [
+                    company_table, users_table, applications_table
+                ]
                 for other_table in available_tables:
                     if other_table != table:
-                        record = CRUD(other_table, record_id=record_id, option='read')
+                        record = CRUD(other_table,
+                                      record_id=record_id,
+                                      option='read')
                         if record:
                             return record
-                # If not found in any table, return None
                 return None
         else:
             raise ValueError(
