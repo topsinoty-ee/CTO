@@ -1,5 +1,6 @@
 from ..env_config import DROPBOX_ACCESS_TOKEN, DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET
 import dropbox
+import dropbox.exceptions as dbx_exceptions
 from ..logging_config import logger
 import threading
 import time
@@ -49,14 +50,22 @@ def upload_file(file, file_name, delay=100):
     Returns:
         A direct link to the uploaded file, or None if an error occurs.
     """
+    MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB
+    MIN_FILE_SIZE = 4  # 4 bytes
+
     access_token = DROPBOX_ACCESS_TOKEN
     dbx = get_dropbox_client(access_token)
     try:
-        
-
         # Read the file content
         file_contents = file.read()
-        logger.info(f"Uploading file {file_name} with size {len(file_contents)} bytes.")
+        file_size = len(file_contents)
+
+        # Check file size constraints
+        if not (MIN_FILE_SIZE <= file_size <= MAX_FILE_SIZE):
+            logger.error(f"File size error: {file_size} bytes. Must be between 4 bytes and 500 MB.")
+            return None
+
+        logger.info(f"Uploading file {file_name} with size {file_size} bytes.")
 
         # Upload file to Dropbox
         dbx.files_upload(file_contents, '/' + file_name)
@@ -83,14 +92,14 @@ def upload_file(file, file_name, delay=100):
         else:
             return None
 
-    except dbx.exceptions.AuthError as auth_err:
+    except dbx_exceptions.AuthError as auth_err:
         logger.warning(f"Auth error: {auth_err}. Attempting to refresh access token.")
         new_access_token = refresh_access_token()
         if new_access_token:
             return upload_file(file, file_name, delay)  # Retry upload with new access token
         else:
             logger.error("Failed to refresh access token. Cannot proceed with upload.")
-    except dropbox.exceptions.ApiError as api_err:
+    except dbx_exceptions.ApiError as api_err:
         logger.error(f"Dropbox API error while uploading file {file_name}: {api_err}")
     except Exception as e:
         logger.error(f"An error occurred while uploading file {file_name}: {e}")
@@ -110,7 +119,7 @@ def delete_file(file_name, delay):
         dbx = get_dropbox_client(access_token)
         dbx.files_delete('/' + file_name)
         logger.info(f"Deleted file {file_name} from Dropbox after {delay} seconds.")
-    except dropbox.exceptions.ApiError as api_err:
+    except dbx_exceptions.ApiError as api_err:
         logger.error(f"Dropbox API error while deleting file {file_name}: {api_err}")
     except Exception as e:
         logger.error(f"An error occurred while deleting file {file_name}: {e}")

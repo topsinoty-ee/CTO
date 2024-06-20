@@ -43,7 +43,7 @@
 <body class="flex flex-col items-center justify-start min-h-screen">
     <!-- Header -->
     {% set nav_links = [
-        { "href": "/applications/" ~ company_data.id, "name": "Applications" },
+        { "href": "/" ~ company_data.id ~ "/applications", "name": "Applications" },
         { "href": "/logout", "name": "Logout" }
     ] %}
     {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
