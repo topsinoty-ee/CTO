@@ -51,7 +51,7 @@
     navbar(logo=logo|safe, navlinks=nav_links) }}
     <!-- Main Content -->
     <main>
-      {{ render_form(url_for('sign_up'), 'POST', [ {'id': 'email', 'name':
+      {{ render_form('/sign-up' , 'POST', [ {'id': 'email', 'name':
       'email', 'type': 'email', 'placeholder': 'Email', 'required': True},
       {'id': 'password', 'name': 'password', 'type': 'password', 'placeholder':
       'Password', 'required': True}, {'id': 'company_name', 'name':
