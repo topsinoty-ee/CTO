@@ -10,7 +10,7 @@
             {% for field in fields %}
               {% if field.type == 'image' %}
                 {% if field.editable %}
-                  <input type="file" disabled id="{{ field.key }}" name="{{ field.key }}" class="file-input file-input-bordered w-full max-w-xs disabled" />
+                  <input type="file" id="{{ field.key }}" name="{{ field.key }}" class="file-input file-input-bordered w-full max-w-xs" />
                 {% else %}
                   <img src="{{ data[field.key][0]['url'] }}" />
                 {% endif %}
