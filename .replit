@@ -1,5 +1,5 @@
 entrypoint = "main.py"
-modules = ["python-3.10:v18-20230807-322e88b"]
+modules = ["nodejs-20", "python-3.10:v18-20230807-322e88b"]
 
 [nix]
 channel = "stable-23_05"
@@ -11,9 +11,17 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["python3", "main.py"]
+run = ["sh", "-c", "python3 main.py & npm run watch-css"]
 deploymentTarget = "cloudrun"
 
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[auth]
+pageEnabled = false
+buttonEnabled = false

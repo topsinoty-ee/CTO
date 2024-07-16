@@ -1,0 +1,74 @@
+{% from 'modals/edit_modal.html' import edit_modal %}
+{% from 'modals/add_modal.html' import add_modal %}
+
+
+{% macro application_card_list(title, data_source, crud = {}, cols=2) %}
+<div class="col-span-3 w-full h-full shadow-md bg-gray  overflow-hidden gap-8 flex flex-col">
+  <div class='px-4 py-2 flex justify-between'>
+    <h2 class="text-2xl font-bold">{{ title }}</h2>
+    {% if crud and crud['user_id']%}
+    <div>
+      <label for="add-{{crud['table']}}" class='btn-base-100 btn text-base-content rounded-md px-2 py-1'>Add</label>
+      {% if not crud['no_link'] %}
+          <a href="/{{ crud.user_id }}/applications" data-test="{{crud.user_id}}" target="_blank" class="btn btn-ghost border-2 border-base-200">View your applications</a>
+      {% endif %}
+
+    </div>
+    {% endif %}
+  </div>
+
+  <ul class="flex flex-col grid grid-cols-{{cols}} gap-2 overflow-auto px-4">
+    {% for app in data_source %}
+      {% set is_active_bool = app.isActive != 0 %}
+      <li>
+        <label for="toggle-{{ app.id }}" class="card bg-base-200 w-full mb-4 collapse">
+          <input type="checkbox" id="toggle-{{ app.id }}" class="peer hidden" data-radio-checkbox>
+          <div class="card-body flex flex-row items-center">
+            <div class="flex-none w-20 h-20">
+              <div class="rounded-full w-full h-full flex items-center justify-center">
+                {% if app.logo and app.logo[0] %}
+                  <img src="{{ app.logo[0].url }}" alt="Application" class="h-20 aspect-square rounded-full" />
+                {% else %}
+                  <div class="bg-base-200 h-20 w-20 rounded-full flex items-center justify-center">
+                    <span>No Logo</span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="flex-grow ml-4">
+              <div class="flex justify-between items-center">
+                <h2 class="card-title text-xl truncate">{{ app.jobName }}</h2>
+                <span class="badge {{ 'badge-error' if not is_active_bool else 'badge-success' }}"></span>
+              </div>
+              {% if app.companyName and app.companyName[0] %}
+              <p class="text-sm text-gray-500">{{ app.companyName[0] }}</p>
+              {% else %}
+              <p class="text-sm text-error">Error!</p>
+              {% endif %}
+              <div class="flex justify-between text-sm text-gray-500 mt-2">
+                <span>Posted {{ app.postedDate | format_datetime(format='%d.%m.%Y %H:%M') }}</span>
+                <span>Deadline {{ app.deadline | format_datetime(format='%d.%m.%Y') }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="collapse-content mt-2 peer-checked:flex hidden">
+            <div class="w-full">
+              <label for="view-{{ app.id }}" class="btn btn-success">View</label>
+              {% if crud %}
+              <label for="edit-{{ app.id }}" class="btn btn-info">Edit</label>
+              <label for="delete-{{ app.id }}" class="btn btn-error mr-2">Delete</label>
+              {% endif %}
+            </div>
+          </div>
+        </label>
+        {% if crud %}
+          {{ edit_modal(id=app.id, title=app.title, data=app, table=crud.table, fields=crud.fields) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% if crud %}
+  {{ add_modal(title=title, table=crud.table, fields=crud.fields, computed_fields=crud.computed_fields )}}
+  {% endif %}
+</div>
+{% endmacro %}

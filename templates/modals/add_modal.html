@@ -1,0 +1,57 @@
+{% macro add_modal(title, table, fields, computed_fields=[]) %}
+  <input type="checkbox" id="add-{{ table }}" class="modal-toggle hidden" />
+  <div class="modal fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="modal-box flex items-center justify-center max-h-screen">
+      <div class="modal-content bg-white rounded-lg shadow-lg p-6">
+        <label for="add-{{ table }}" class="modal-close absolute top-0 right-0 mt-4 mr-4 cursor-pointer btn btn-neutral">&times;</label>
+        <h2 class="text-lg font-bold mb-4">Add {{ title }}</h2>
+        <form action="/create/{{ table }}" method="post" enctype="multipart/form-data">
+          <input type='hidden' value="{{computed_fields}}" name="computed_fields">
+          <div class="grid grid-cols-1 gap-4">
+            {% for field in fields if field.addable %}
+              {% if field.type == 'image' %}
+                <input type="file" id="{{ field.key }}" name="{{ field.key }}" class="file-input file-input-bordered w-full max-w-xs" />
+              {% elif field.type == 'boolean' %}
+                <div class="form-control">
+                  <label class="label cursor-pointer">
+                    <span class="label-text">Deactivated</span>
+                    <input type="checkbox" data-radio-checkbox-add name="{{field.key}}" class="toggle toggle-error checked:bg-red-500" value="false" />
+                  </label>
+                </div>
+                <div class="form-control">
+                  <label class="label cursor-pointer">
+                    <span class="label-text">Active</span>
+                    <input type="checkbox" data-radio-checkbox-add name="{{field.key}}" class="toggle toggle-info checked:bg-blue-500" value="true"/>
+                  </label>
+                </div>
+              {% else %}
+                <input type="{{field.type}}" name="{{field.key}}" placeholder="{{field.name}}" class="input input-bordered w-full max-w-xs focus:border-base-300 focus:ring focus:ring-base-200 focus:ring-opacity-50" />
+              {% endif %}
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary mt-4 modal-close">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all checkboxes with the attribute 'data-radio-checkbox-add'
+    const checkboxes = document.querySelectorAll('[data-radio-checkbox-add]');
+
+    // Add an event listener to each checkbox
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                checkboxes.forEach(box => {
+                    if (box !== this) {
+                        box.checked = false;
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+{% endmacro %}

@@ -5,6 +5,7 @@ from flask import redirect, request
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     """

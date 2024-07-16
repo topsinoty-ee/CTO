@@ -1,59 +1,37 @@
-{% from 'macros.html' import navbar, call_to_actions as actions, list %}
+{% from 'macros/macros.html' import call_to_actions as actions %}
+{% from 'macros/navbar.html' import navbar %}
+{% from 'macros/application_list.html' import application_card_list as list %}
+
+
+{% set dashboard = "/" if is_logged_in else "/dashboard" %}
+
+{% set nav_links = [
+    { "href": dashboard, "name": "Dashboard" },
+    { "href": "/all-applications", "name": "View applications" }, 
+    { "href": "/all-companies", "name": "Browse Companies" },
+] %}
+
 
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Veric</title>
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="../static/css/style.css" />
-    <!-- Include custom CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include Tailwind CSS -->
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Include Google Fonts -->
-
-    <!-- Tailwind Customization Script -->
-    <script>
-      var tailwind = {
-        theme: {
-          colors: {
-            content: "#386641",
-            "logo-prime": "#6A994E",
-            "logo-background": "#A7C957",
-            background: "#E9F5DB",
-            black: "#001000",
-          },
-        },
-        plugins: [
-          require("@tailwindcss/forms"),
-          require("tailwindcss-container-queries"),
-          require("@tailwindcss/aspect-ratio"),
-        ],
-      };
-    </script>
+    <title>Browse applications</title>
+    <link rel="stylesheet" href="../static/dist/output.css" />
   </head>
-  <body class="flex flex-col items-center justify-start min-h-screen">
-    {% set nav_links = [ { "href": "/login", "name": "Login" }, { "href":
-    "/sign-up", "name": "Sign up" }, ] %} {% set logo = '<span
-      class="text-3xl font-bold text-gray-800"
-      >Veric</span
-    >' %} {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+  <body class="flex flex-col items-center justify-start min-h-screen overflow-hidden">
+    {{ navbar(navlinks=nav_links, is_logged_in=is_logged_in) }}
 
-    <main class="w-full h-full">
-      <section class="relative flex">
+
+    <main class="w-full h-[90vh] overflow-hidden">
         <div
-          class="left-0 flex flex-col w-2/3 bg-white border border-2 absolute"
+          class="left-0 flex flex-col w-full px-4 py-4 bg-white border border-2 overflow-hidden h-[90vh]"
         >
+          {% set application_data = [] %}
+          {% for app in data %}
+              {% set _ = application_data.append(app.fields) %}
+          {% endfor %}
         {% set displayed_fields = [
           {"name" : "id", "key" : "id", "type" : "text", "editable" : False },
           {"name": "Application name", "editable": True, "key": "jobName", "type": "text"},
@@ -63,17 +41,11 @@
         ]%}
 
         {{ list( 
-          data=data,
-          fields=displayed_fields,
-          is_editable=false,
-          table=table,
-          has_image=True,
-          is_addable=False,
-          is_deletable=False,
+          title="All posted applications",
+          data_source=application_data,
+          cols = 3
         )}}
         </div>
-        <div class="right-0 w-1/3 h-full absolute"></div>
-      </section>
     </main>
 
     <script

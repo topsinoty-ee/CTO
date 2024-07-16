@@ -9,6 +9,9 @@ DROPBOX_ACCESS_TOKEN = os.environ.get('DROPBOX_ACCESS_TOKEN')
 DROPBOX_REFRESH_TOKEN = os.environ.get('DROPBOX_REFRESH_TOKEN')
 DROPBOX_APP_KEY = os.environ.get('DROPBOX_APP_KEY')
 DROPBOX_APP_SECRET = os.environ.get('DROPBOX_APP_SECRET')
+REDIRECT_URI = os.environ['DROPBOX_REDIRECT_URI']
+
+
 
 def check_env_vars():
     """
@@ -26,11 +29,14 @@ def check_env_vars():
         'DROPBOX_ACCESS_TOKEN': DROPBOX_ACCESS_TOKEN,
         'DROPBOX_REFRESH_TOKEN': DROPBOX_REFRESH_TOKEN,
         'DROPBOX_APP_KEY': DROPBOX_APP_KEY,
-        'DROPBOX_APP_SECRET': DROPBOX_APP_SECRET
+        'DROPBOX_APP_SECRET': DROPBOX_APP_SECRET,
+        'DROPBOX_REDIRECT_URI': REDIRECT_URI
     }
 
     missing_vars = [key for key, value in required_vars.items() if not value]
     if missing_vars:
-        raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
+        raise ValueError(
+            f"Missing environment variables: {', '.join(missing_vars)}")
+
 
 check_env_vars()
