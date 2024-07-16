@@ -1,0 +1,94 @@
+{% from 'modals/edit_modal.html' import edit_modal as edit %}
+
+{% macro company_card(
+  data_source,
+  form_title,
+  displayed_fields,
+  data_source_table,
+  editable=False,
+  deletable=False,
+  image=False) 
+%} 
+{% set data = {} %}
+{% set logo_url = '' %}
+{% for key, value in data_source.items() %} 
+  {% for field in displayed_fields %}
+    {% if field.key == key %} 
+      {% set _ = data.update({key: value}) %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+{% set id = data.get('id', '') %}
+{% set name = data.get('name', '') %}
+{% set email = data.get('email', '') %}
+{% set phone = data.get('phone', '') %}
+{% set address = data.get('address', '') %}
+{% set logo_url = data.get('logo', [{'url':''}])[0]['url'] %}
+
+<div class="card bg-base-300 image-full before:bg-white max-w-96 h-full w-full shadow-xl">
+  <figure>
+    {% if logo_url %}
+    <img src="{{ logo_url }}" alt="Company Logo" class="w-full bg-white" />
+    {% else %}
+    <span class="loading loading-spinner loading-xs"></span>
+    {% endif %}
+  </figure>
+  <div
+    class="bg-base-200 card-body content-end items-end rounded-lg self-end shadow-lg"
+  >
+    {% if id %}
+    <div class="">
+      <small class="text-xs text-neutral-content">Company ID: {{ id }}</small>
+    </div>
+    {% endif %}
+    
+    {% if name %}
+    <h2 class="card-title">{{ name }}</h2>
+    {% endif %}
+    <div>
+      {% if email %}
+      <p><a href="mailto:{{ email }}" class="text-blue-500">{{ email }}</a></p>
+      {% endif %} 
+      
+      {% if phone %}
+      <p>Phone: {{ phone }}</p>
+      {% endif %}
+      
+      {% if address %}
+      <p>Address: {{ address }}</p>
+      {% endif %}
+    </div>
+    <div class="card-actions justify-end">
+      {% if editable %}
+      <label
+        for="edit-{{ id }}"
+        class="btn btn-primary text-primary-content"
+      >
+        Edit
+      </label>
+      {% endif %}
+      
+      {% if deletable %}
+      <button
+        class="btn btn-danger"
+        onclick="openModal('deleteModal-{{ id }}')"
+      >
+        Delete
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+{% if editable %}
+  {{ edit(
+    id=id,
+    title=form_title,
+    data=data_source,
+    table = data_source_table,
+    fields=displayed_fields
+  )}}
+{% endif %} 
+
+{% endmacro %}

@@ -16,18 +16,20 @@ def edit(table, id):
     logger.info(record)
     if request.method == 'POST':
         form_data = request.form['form_data']
+        title = request.form['title']
 
         if form_data is not None:
             logger.info(f"form_data: {form_data}")
             displayed_data = convert_to_json(form_data)
         # Process the displayed_data as needed
         logger.info(f"Edited data: {displayed_data}")
-        return render_template('update_form.html',
+        return render_template('update-form.html',
                                formdata=displayed_data,
                                data=record,
-                               table=table)
+                               table=table,
+                               title=title)
 
-    return render_template('update_form.html',
+    return render_template('update-form.html',
                            formdata=displayed_data,
                            is_edit=True)
 
@@ -47,12 +49,12 @@ def add(table: str):
             ]
 
             logger.info(f"Data to add: {displayed_data}")
-            return render_template('add_form.html',
+            return render_template('add-form.html',
                                    formdata=displayed_data,
                                    table=table,
                                    computed_field=computed_field)
 
-    return render_template('add_form.html',
+    return render_template('add-form.html',
                            formdata=displayed_data,
                            table=table)
 
@@ -80,10 +82,20 @@ def update(table_key: str, id):
         record = search_record_by_id(Table, id)
         logger.info(record)
         # write logic that compare
-        data = {
-            key: value
-            for key, value in request.form.items() if value.strip() != ""
-        }
+        data = {}
+        for key, value in request.form.items():
+            if value.strip() != "":
+                if key == 'activated':
+                    data[key] = (value.lower() == 'true')  # Convert checkbox value to boolean
+                else:
+                    data[key] = value  # Assign other form values directly
+
+        files = request.files.to_dict()
+
+        # Remove 'id' from data dictionary (if present)
+        data.pop('id', None)
+        
+        logger.info(f'form-request {request.form.to_dict()} ')
         data.pop('id', None)
         files = request.files.to_dict()
 
@@ -95,7 +107,7 @@ def update(table_key: str, id):
     except Exception as e:
         logger.error(
             f"Error updating record with ID {id} in table {table_key}: {e}")
-        return "An error occurred", 500
+        return 500
 
 
 def create(table: str):
@@ -103,25 +115,25 @@ def create(table: str):
         Table = init_table(table)
 
         # Get form data and log it
-        formdata = request.form.items()
-        computed_field = request.form.get('computed_field')
-        logger.info(f"computed_field: {computed_field}")
+        formdata = request.form.to_dict()
+        computed_fields = formdata.get('computed_fields')  # Get computed_fields from formdata
+        logger.info(f"computed_fields: {computed_fields}")
         logger.info(f"formdata: {formdata}")
 
-        # Parse the computed_field JSON string into a Python dictionary
-        computed_field_data = convert_to_json(computed_field)
+        # Parse the computed_field JSON string into a Python dictionary if it exists
+        computed_field_data = convert_to_json(computed_fields) if computed_fields else {}
         logger.info(f"computed_field_data: {computed_field_data}")
 
-        # Add form data to the data dictionary, excluding the computed field initially
+        # Add form data to the data dictionary, excluding the computed fields initially
         data = {
             key: value
-            for key, value in formdata if key != 'computed_field'
+            for key, value in formdata.items() if key != 'computed_fields'
         }
         logger.info(f"data: {data}")
-        # Add the computed field to the data dictionary
-        if 'key' in computed_field_data and 'value' in computed_field_data:
-            data[computed_field_data['key']] = [computed_field_data['value']]
-        logger.info(f"data after adding computed_field: {data}")
+
+        # Add computed_field_data to data dictionary if computed_fields were provided
+        for field in computed_field_data:
+            data[field['key']] = [field['value']]
 
         # Get files and log them
         files = request.files.to_dict()

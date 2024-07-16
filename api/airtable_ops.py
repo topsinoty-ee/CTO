@@ -88,7 +88,7 @@ def search_record_by_id(table: Table, record_id: str):
                 "record_id must be either a string or a list of strings")
     except Exception as e:
         logger.error(f"Error searching for record(s) with ID {record_id}: {e}")
-        return None
+        return 404
 
 
 # TABLES

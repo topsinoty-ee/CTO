@@ -1,0 +1,70 @@
+{% macro edit_modal(id, title, data, table, fields) %}
+  <input type="checkbox" id="edit-{{ id }}" class="modal-toggle hidden" />
+  <div class="modal fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="modal-box flex items-center justify-center max-h-screen">
+      <div class="modal-content bg-white rounded-lg shadow-lg p-6">
+        <label for="edit-{{ id }}" class="modal-close absolute top-0 right-0 mt-4 mr-4 cursor-pointer btn btn-neutral">&times;</label>
+        <h2 class="text-lg font-bold mb-4">Edit {{ title }}</h2>
+        <form action="/update/{{ table }}/{{ data.id }}" method="post" enctype="multipart/form-data">
+          <div class="grid grid-cols-1 gap-4">
+            {% for field in fields %}
+              {% if field.type == 'image' %}
+                {% if field.editable %}
+                  <input type="file" id="{{ field.key }}" name="{{ field.key }}" class="file-input file-input-bordered w-full max-w-xs" />
+                {% else %}
+                  <img src="{{ data[field.key][0]['url'] }}" />
+                {% endif %}
+              {% elif field.type == 'boolean' %}
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text">Deactivated</span>
+                <input type="checkbox" data-radio-checkbox-edit name="{{field.key}}" class="toggle toggle-error checked:bg-red-500" {% if data[field.key] %}checked{% endif %} value="false" />
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text">Active</span>
+                <input type="checkbox" data-radio-checkbox-edit name="{{field.key}}" class="toggle toggle-info checked:bg-blue-500" {% if data[field.key] %}checked{% endif %} value="true"/>
+              </label>
+            </div>
+              {% else %}
+                {% if field.editable %}
+            <input type="{{field.type}}" name="{{field.key}}" placeholder="{{field.name}}" class="input input-bordered w-full max-w-xs focus:border-base-300 focus:ring focus:ring-base-200 focus:ring-opacity-50" />
+
+                {% else %}
+                  <div class="shadow-inner shadow-base-200 rounded-lg bg-base-100 p-4">
+                    <span class="font-semibold uppercase">{{ field.name }}:</span>
+                    <span>{{ data[field.key] }}</span>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </div>
+          <button type="submit" onclick="() => {
+            window.location.reload()
+          }" class="btn btn-primary mt-4 modal-close">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all checkboxes with the attribute 'data-radio-checkbox'
+    const checkboxes = document.querySelectorAll('[data-radio-checkbox-edit]');
+
+    // Add an event listener to each checkbox
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                checkboxes.forEach(box => {
+                    if (box !== this) {
+                        box.checked = false;
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+{% endmacro %}

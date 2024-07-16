@@ -1,7 +1,10 @@
 from flask import redirect, request, render_template
 from api.auth import (sign_up_as_company, login_as_company)
 from user import User
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, current_user
+from api.logging_config import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Sign up
@@ -36,7 +39,7 @@ def sign_up():
             return redirect(f'/{company_id}/company-dashboard')
         else:
             # Handle sign-up failure
-            return render_template('sign_up.html', email_taken=True)
+            return render_template('sign-up.html', email_taken=True)
     return render_template('sign_up.html')
 
 
@@ -54,15 +57,22 @@ def login():
     Returns:
         str: Rendered HTML template for the login page or redirect to the company's dashboard.
     """
+    if current_user.is_authenticated:
+        return redirect('/')
+        
+    next_url = request.args.get('next')
+    logger.info(request.full_path)
+    logger.info(f'Next URL (before POST check): {next_url}')
+
     if request.method == 'POST':
-        next_url = request.args.get('next')
+        logger.info(f'Next URL (after POST check): {next_url}')
 
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        next_url = request.form.get('next', '').strip()
 
-        if not email.strip() and not password.strip():
-            return render_template('login.html',
-                                   error='Please fill in all fields.')
+        if not email or not password:
+            return render_template('login.html', error='Please fill in all fields.')
 
         # Log in as a company
         company = login_as_company(email, password)
@@ -71,20 +81,16 @@ def login():
             user = User(company['id'])
 
             # Log in the user
-            login_user(user)
+            login_user(user, remember=True)
 
-            # Redirect to the company's dashboard
-            company_id = company["id"].strip('{}')  # Remove curly braces
             if next_url:
                 return redirect(f'/{next_url}')
             else:
-                return redirect(f'/{company_id}/company-dashboard')
+                return redirect(f'/{current_user.id}/company-dashboard')
         else:
             # Handle login failure
-            return render_template('login.html',
-                                   error='Invalid email or password')
-    return render_template('login.html')
-
+            return render_template('login.html', error='Invalid email or password')
+    return render_template('login.html', next_url=next_url)
 
 # Logout
 def logout():

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found</title>
+    <title>Internal Server Error</title>
     <link rel="stylesheet" href="../static/dist/output.css" />
 </head>
 <body class="flex flex-col items-center justify-start min-h-screen">
@@ -16,11 +16,13 @@
     {{ navbar(navlinks=nav_links, is_login=True) }}
     <main>
         <div class="text-center">
-            <div class="text-9xl font-bold text-primary mb-4">404</div>
-            <div class="text-2xl font-semibold mb-4">Oops! Page not found.</div>
-            <p class="text-lg mb-4">The page you are looking for doesn't exist or has been moved.</p>
-            <a href="/" class="btn btn-primary">Return to Home</a>
-        </div>
+        <div class="text-9xl font-bold text-error mb-4">500</div>
+        <div class="text-2xl font-semibold mb-4">Internal Server Error</div>
+        <p class="text-lg mb-4">Something went wrong on our end. Please try again later.</p>
+        <p class="text-lg mb-4">You can try going to the home page.</p>
+        <a href="/" class="btn btn-error">Return to Home</a>
+    </div>
     </main>
+    
 </body>
 </html>

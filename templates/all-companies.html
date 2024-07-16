@@ -1,5 +1,16 @@
 <!-- Import Jinja Macros -->
-{% from 'macros.html' import navbar, call_to_actions as actions, list %}
+{% from 'macros/macros.html' import call_to_actions as actions, list %}
+{% from 'macros/navbar.html' import navbar %}
+
+
+{% set dashboard = "/" if is_logged_in else "/dashboard" %}
+
+{% set nav_links = [
+    { "href": dashboard, "name": "Dashboard" },
+    { "href": "/all-applications", "name": "View applications" }, 
+    { "href": "/all-companies", "name": "Browse Companies" },
+] %}
+
 
 <!DOCTYPE html>
 <html lang="en" data-theme="wireframe">
@@ -7,50 +18,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>All Companies (for testing)</title>
+    <link rel="stylesheet" href="../static/dist/output.css" />
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="../static/css/style.css" />
-    <!-- Include custom CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include Tailwind CSS -->
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Include Google Fonts -->
-
-    <!-- Tailwind Customization Script -->
-    <script>
-      var tailwind = {
-        theme: {
-          colors: {
-            content: "#386641",
-            "logo-prime": "#6A994E",
-            "logo-background": "#A7C957",
-            background: "#E9F5DB",
-            black: "#001000",
-          },
-        },
-        plugins: [
-          require("@tailwindcss/forms"),
-          require("tailwindcss-container-queries"),
-          require("@tailwindcss/aspect-ratio"),
-        ],
-      };
-    </script>
+    
   </head>
 
   <body class="flex flex-col items-center justify-start min-h-screen">
     <!-- Header -->
-    {% set nav_links = [ { "href": "/login", "name": "Login" }, { "href":
-    "/sign-up", "name": "Sign up" }, ] %} {% set logo = '<span
-      class="text-3xl font-bold text-gray-800"
-      >Veric</span
-    >' %} {{ navbar(logo=logo | safe, navlinks=nav_links) }}
+    {{ navbar(navlinks=nav_links, is_logged_in=is_logged_in) }}
 
     <!-- Main Content -->
     <main

@@ -20,29 +20,28 @@
       { "href": "/all-companies", "name": "Browse Companies" },
       { "href": "/dashboard", "name": "Dashboard" },
     ] %}
-    {{ navbar(navlinks=nav_links, is_login=True) }}
+    {{ navbar(navlinks=nav_links, is_sign_up=True) }}
     <!-- Main Content -->
     <main class="h-[90vh] login-main w-full flex content-start flex-wrap justify-center">
       <div
         class="w-1/2 h-screen mx-auto p-[6rem] border border-gray login-content shadow-md box-border"
       >
-        <h1 class="text-3xl mb-[2rem] text-gray-800 mx-auto">Log In</h1>
-        {% set fields = [
-          {'id': 'email', 'name':'email', 'type': 'email', 'placeholder': 'Email', 'required': True},
-          {'id': 'password', 'name': 'password', 'type': 'password','placeholder': 'Password', 'required': True}, 
-        ] %}
-        {% if next_url %}
-          {% set _  = fields.append({'id': 'next', 'name': 'next', 'type': 'hidden', 'value': next_url}) %}
-        {% endif %}
-        {{ render_form(
-        '/login',
-        'POST',
-        fields
-        ) }}
+        <h1 class="text-3xl mb-[2rem] text-gray-800 mx-auto">Sign up</h1>
+        {{ render_form('/sign-up' , 'POST', [ {'id': 'email', 'name':
+        'email', 'type': 'email', 'placeholder': 'Email', 'required': True},
+        {'id': 'password', 'name': 'password', 'type': 'password', 'placeholder':
+        'Password', 'required': True}, {'id': 'company_name', 'name':
+        'company_name', 'type': 'text', 'placeholder': 'Company Name', 'required':
+        True} ]) }}
       </div>
       <div class="w-1/2 h-full bg-primary">
-        <img src="{{url_for('static', filename='images/login-background.jpg')}}" alt="login-background" class="w-full h-full object-cover" />
+        <img src="{{url_for('static', filename='images/sign-up-background.jpg')}}" alt="sign-background" class="w-full h-full object-cover" />
       </div>
     </main>
+    <script>
+      {% if email_taken %}
+        alert("Email already exists");
+      {% endif %}
+    </script>
   </body>
 </html>

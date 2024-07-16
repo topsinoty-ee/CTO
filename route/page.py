@@ -19,9 +19,9 @@ def home():
     Returns:
         str: Rendered HTML template for the homepage.
     """
-
+    args_and_queries = request.full_path
     if current_user.is_authenticated:
-        return redirect(f'/{current_user.id}/company-dashboard')
+        return redirect(f'/{current_user.id}/company-dashboard{args_and_queries[1:]}')
     else:
         return render_template('index.html')
 
@@ -48,7 +48,8 @@ def all_applications():
                            table=APPLICATIONS_TABLE_KEY,
                            applications_table=applications_table,
                            data=applications_data,
-                           search=search_record_by_id)
+                           search=search_record_by_id,
+                           is_logged_in=current_user.is_authenticated)
 
 
 # All companies page
@@ -62,9 +63,10 @@ def all_companies():
 
     companies_data = fetch_all_records(company_table)
 
-    return render_template('all_companies.html',
+    return render_template('all-companies.html',
                            data=companies_data,
-                           search=search_record_by_id)
+                           search=search_record_by_id,
+                           is_logged_in=current_user.is_authenticated)
 
 
 # User dashboard
@@ -78,12 +80,25 @@ def dashboard(company_id):
     Returns:
         str: Rendered HTML template for the company's dashboard with company data.
     """
-
     company_data = search_record_by_id(company_table, company_id)
+    applications_data = []
 
-    return render_template('dashboard.html',
-                           company_data=company_data,
-                           table=COMPANY_TABLE_KEY)
+    if isinstance(company_data, dict):
+        all_company_application_ids = company_data.get('fields', {}).get('applications', [])
+
+        for application_id in all_company_application_ids:
+            application_data = search_record_by_id(applications_table, application_id)
+            applications_data.append(application_data)
+    else:
+        all_company_application_ids = []
+
+    return render_template(
+        'dashboard.html',
+        company_data=company_data,
+        table=COMPANY_TABLE_KEY,
+        applications_data=applications_data,
+        applications_table=APPLICATIONS_TABLE_KEY
+    )
 
 
 def company_applications(company_id):
@@ -102,15 +117,16 @@ def company_applications(company_id):
 
     company_data = search_record_by_id(company_table, company_id)
     applications_data = []
-    all_company_application_ids = company_data['fields'].get(
-        'applications', [])
 
-    for application_id in all_company_application_ids:
-        application_data = search_record_by_id(applications_table,
-                                               application_id)
-        applications_data.append(application_data)
+    if isinstance(company_data, dict):
+        all_company_application_ids = company_data.get('fields', {}).get('applications', [])
 
-    logger.info(applications_data)
+        for application_id in all_company_application_ids:
+            application_data = search_record_by_id(applications_table, application_id)
+            applications_data.append(application_data)
+    else:
+        all_company_application_ids = []
+    logger.info('applications loaded!')
     return render_template(
         'applications.html',
         data=applications_data,

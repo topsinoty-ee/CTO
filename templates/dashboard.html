@@ -1,83 +1,100 @@
 <!-- Import Jinja Macros -->
-{% from 'macros.html' import navbar, call_to_actions as actions, card %}
+{% from 'macros/macros.html' import  call_to_actions as actions, card %}
+{% from 'macros/navbar.html' import navbar %}	
+{% from 'macros/company_profile_card.html' import company_card as card %}
+{% from 'macros/application_list.html' import application_card_list as card_list %}
+
+
+{% set nav_links = [
+    { "href": "/all-applications", "name": "View applications" }, 
+    { "href": "/all-companies", "name": "Browse Companies" },
+] %}
+
+
+{% set displayed_fields = [
+    { "name": "id", "key": "id", "type": "text", "editable": False },
+    { "name": "Company Name", "editable": True, "key": "name", "type": "text" },
+    { "name": "Company Email", "editable": True, "key": "email", "type": "email" },
+    { "name": "Company Phone Number", "editable": True, "key": "contact", "type": "tel" },
+    { "name": "Logo", "editable": True, "key": "logo", "type": "image" }
+] %}
+
+{% set application_data = [] %}
+{% for app in applications_data %}
+    {% set _ = application_data.append(app.fields) %}
+{% endfor %}
+
+{% set editable_fields = [
+  {'key': 'jobName', 'editable': True, 'addable':True, 'type': 'text', "name": "Application name"},
+  {'key': 'deadline', 'editable': True, 'addable':True, 'type': 'date', "name": "Deadline"},
+  {'key': 'activated', 'editable': True, 'addable':False, 'type': 'boolean', "name": "Is Active", }
+] %}
+
+{% set computed_fields = [
+    {'key': 'company', "value": company_data.fields.id}
+] %}
+
+{% set crud_dict = {
+    "fields" : editable_fields,
+    "table" : applications_table,
+    "user_id" : company_data.fields.id,
+    "computed_fields" : computed_fields
+} %}
+
 
 <!DOCTYPE html>
-<html lang="en" data-theme="wireframe">
+<html lang="en" data-theme="mytheme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veric</title>
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="../static/css/style.css">
-    <!-- Include custom CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include Tailwind CSS -->
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <!-- Include Google Fonts -->
-
-    <!-- Tailwind Customization Script -->
-    <script>
-        var tailwind = {
-            theme: {
-                colors: {
-                    content: "#386641",
-                    "logo-prime": "#6A994E",
-                    "logo-background": "#A7C957",
-                    background: "#E9F5DB",
-                    black: "#001000",
-                },
-            },
-            plugins: [
-                require("@tailwindcss/forms"),
-                require("tailwindcss-container-queries"),
-                require("@tailwindcss/aspect-ratio"),
-            ],
-        };
-    </script>
+    <title>{{company_data.fields.name}}'s dashboard</title>
+    <link rel="stylesheet" href="../static/dist/output.css" />
 </head>
-<body class="flex flex-col items-center justify-start min-h-screen">
+<body class="flex flex-col items-center justify-start max-h-screen relative w-full">
     <!-- Header -->
-    {% set nav_links = [
-        { "href": "/" ~ company_data.id ~ "/applications", "name": "Applications" },
-        { "href": "/logout", "name": "Logout" }
-    ] %}
-    {% set logo = '<span class="text-3xl font-bold text-gray-800">Veric</span>' %}
-    {{ navbar(logo=logo|safe, navlinks=nav_links) }}
+    {{ navbar(navlinks=nav_links, is_logged_in=True) }}
 
-    <main>
-        <div class="w-[40rem] mx-auto my-8">
-            {% set displayed_fields = [
-                { "name": "id", "key": "id", "type": "text", "editable": False },
-                { "name": "Company Name", "editable": True, "key": "name", "type": "text" },
-                { "name": "Company Email", "editable": True, "key": "email", "type": "email" },
-                { "name": "Company Phone Number", "editable": True, "key": "contact", "type": "tel" },
-                { "name": "Logo", "editable": True, "key": "logo", "type": "image" }
-            ] %}
+    <main class="flex w-full relative h-[calc(100vh-5rem)]">
+        <div class="w-full mx-auto py-10 px-4 h-full grid grid-cols-4 gap-4">
+            <div class='h-full w-full'>
             {{ card(
+                form_title="Company Profile",
                 data_source=company_data.fields,
                 displayed_fields=displayed_fields,
                 editable=True,
                 data_source_table=table,
                 image=True
             ) }}
+            </div>
+            <div class='col-span-3 w-full h-full shadow-md bg-gray  overflow-hidden gap-8 flex flex-col'>
+                              
+                    {{ card_list(title = "Posted applications", data_source = application_data, crud = crud_dict) }}
+                </div>
+                
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="h-40 flex flex-col items-center justify-center w-full space-y-4">
-        <img src="../static/images/logo-white.svg" alt="Logo" class="w-16">
-        <p class="text-center text-gray-700">
-            &copy; {{current_year}} Veric. All rights reserved.
-        </p>
-    </footer>
-
     <!-- External JavaScript -->
     <script src="https://kit.fontawesome.com/68c16b630a.js" crossorigin="anonymous"></script>
     <!-- Include Font Awesome -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all checkboxes with the attribute 'data-radio-checkbox'
+        const checkboxes = document.querySelectorAll('[data-radio-checkbox]');
+
+        // Add an event listener to each checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    checkboxes.forEach(box => {
+                        if (box !== this) {
+                            box.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

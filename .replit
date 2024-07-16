@@ -11,10 +11,17 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["npm", "run watch-css", "&", "python3", "main.py"]
+run = ["sh", "-c", "python3 main.py & npm run watch-css"]
 deploymentTarget = "cloudrun"
-
 
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[auth]
+pageEnabled = false
+buttonEnabled = false

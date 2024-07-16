@@ -1,0 +1,89 @@
+{% from 'macros/macros.html' import call_to_actions as actions, list %}
+{% from 'macros/navbar.html' import navbar %}
+
+<!doctype html>
+<html lang="en" data-theme="mytheme">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit</title>
+    <link rel="stylesheet" href="../static/dist/output.css" />
+  </head>
+  <body class="flex flex-col items-center justify-start min-h-screen relative
+    
+    <!-- Header -->
+    {% set nav_links = [ 
+      { 
+        "href": "/all-applications",
+        "name": "View applications"
+      }, 
+      { "href": "/all-companies",
+        "name": "Browse Companies"
+      },
+      {
+        "href": "/logout",
+        "name": "Logout"
+      } 
+    ] %}
+    
+    {{ navbar(navlinks=nav_links,
+    is_logged_in=True) }}
+    <main>
+      <form
+        class="flex flex-col items-center justify-center p-4 space-y-2 border border-gray-300 rounded"
+        method="post"
+        action="/update/{{ table }}/{{ data.id }}"
+        enctype="multipart/form-data"
+      >
+        {% for field in formdata %}
+        <label for="{{ field.key }}">
+          {{ field.name }} 
+            {% if field.type == 'image' %} 
+              {% if field.editable %}
+                <input
+                  type="file"
+                  id="{{ field.key }}"
+                  name="{{ field.key }}"
+                  class="mt-1 block w-full"
+                />
+              {% else %}
+              <img src="{{ data.fields[field.key][0]['url'] }}" />
+              {% endif %}
+            {% else %}
+          {% if field.editable %}
+            <input
+              name="{{ field.key }}"
+              id="{{ field.key }}"
+              type="{{ field.type }}"
+              class="mt-1 block w-full"
+              value="{{ data.fields[field.key] }}"
+              />
+          {% else %}
+            <div>
+              <span>{{ field.key }}</span>:
+              <span>{{ data.fields[field.key] }}</span>
+            </div>
+          {% endif %}
+        {% endif %}
+            </label>
+            {% endfor %}
+            <button
+              type="submit"
+              class="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg"
+            >
+              Submit
+            </button>
+          </form>
+        </main>
+
+    <!-- Footer -->
+    <footer
+      class="h-40 flex flex-col items-center justify-center w-full space-y-4"
+    >
+      <img src="../static/images/logo-white.svg" alt="Logo" class="w-16" />
+      <p class="text-center text-gray-700">
+        &copy; {{ current_year }} Veric. All rights reserved.
+      </p>
+    </footer>
+  </body>
+</html>

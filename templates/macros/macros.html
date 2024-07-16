@@ -1,0 +1,142 @@
+{% macro call_to_actions(action_list) %}
+    {% for action in action_list %}
+        <a href="{{ action.href }}" class="block w-full">
+            <button
+                class="px-4 py-2 text-xl bg-content text-white rounded-2xl action-btn w-full hover:bg-content">
+                {{ action.name }}
+            </button>
+        </a>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_field(field) %}
+    <div class="mb-4 p-1 border border-content rounded-xl {% if field.errors %} border-red-500 {% endif %} {% if field.type == 'hidden' %} hidden {% endif %}">
+        <label for="{{ field.id }}" class="block text-sm font-medium">{{ field.label }}</label>
+
+        {% if field.type == 'dropdown' %}
+            <select
+                id="{{ field.id }}"
+                name="{{ field.name }}"
+                class="pt-1 block w-full rounded-md shadow-sm">
+                {% for option in field.options %}
+                    <option value="{{ option.value }}">{{ option.label }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input
+                id="{{ field.id }}"
+                type="{{ field.type }}"
+                name="{{ field.name }}"
+                value="{{ field.value }}"
+                placeholder="{{ field.placeholder }}"
+                {% if field.required %}required{% endif %}
+                class="pt-1 block w-full rounded-md"
+            />
+        {% endif %}
+
+        {% if field.errors %}
+            <ul class="pt-1 text-sm text-red-600">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_form(action, method, fields) %}
+    <form action="{{ action }}" method="{{ method }}">
+        {% for field in fields %}
+            {{ render_field(field) }}
+        {% endfor %}
+        <button
+            type="submit"
+            class="w-full text-white bg-content py-2 px-4 rounded-2xl focus:outline-none action-btn focus:ring-2 bg-content focus:ring-offset-2">
+            Submit
+        </button>
+    </form>
+{% endmacro %}
+
+{% macro list(data, fields, table, is_editable=False, has_image=False, is_addable=False, is_deletable=False, computed_field={}) %}
+    <div class="space-y-4">
+        {% if data %}
+            {% for data_source in data %}
+                {{ card(data_source=data_source.fields, displayed_fields=fields, data_source_table=table, editable=is_editable, deletable=is_deletable, image=has_image) }}
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-gray-500 py-4">
+                {% if is_addable %}
+                    <p>There is nothing here yet. Be the first to add something!</p>
+                {% else %}
+                    <p>There is nothing here.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if is_addable %}
+            <form action="/add/{{ table }}" method="post" class="mt-4">
+                <input type="hidden" name="form_data" value="{{ fields }}" />
+                {% if computed_field %}
+                    <input type="hidden" name="computed_field" value="{{ computed_field }}" />
+                {% endif %}
+                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg">Add New</button>
+            </form>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro card(data_source, displayed_fields, data_source_table, editable=False, deletable=False, image=False) %}
+    {% set form_data = [] %}
+    <div class="flex flex-col items-start justify-center p-4 space-y-4 border border-gray-300 rounded-lg bg-white w-4/5">
+        {% for key, value in data_source.items() %}
+            {% for field in displayed_fields if field.key == key %}
+                {% if field.type == 'image' and image %}
+                    <div class="flex flex-col items-start justify-start space-y-2 py-1">
+                        <span class="font-semibold text-gray-700">Logo:</span>
+                        {% if value and value[0]['url'] %}
+                            <img src="{{ value[0]['url'] }}" alt="{{ value[0]['filename'] }}" class="w-full rounded-lg" />
+                        {% else %}
+                            {% if editable %}
+                                <input
+                                    type="file"
+                                    name="image_upload"
+                                    accept="image/*"
+                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                />
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="flex flex-row items-start justify-start space-x-2 py-1 w-full">
+                        <span class="font-semibold text-gray-700">{{ key }}:</span>
+                        <span class="flex-grow overflow-auto text-gray-600">{{ value | tojson | safe | replace('[', '') | replace(']', '') | replace('"', '') | replace("'", '') }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="mt-4 flex space-x-2">
+        {% if editable %}
+            <form action="/edit/{{ data_source_table }}/{{ data_source.id }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="form_data" value="{{ displayed_fields }}" />
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg">Edit</button>
+            </form>
+        {% endif %}
+
+        {% if deletable %}
+            <form action="/delete/{{ data_source_table }}/{{ data_source.id }}" method="post" class="inline-block">
+                <input type="hidden" name="id" value="{{ data_source.id }}" />
+                <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-lg" onclick="confirmDelete(this.form)">Delete</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <script>
+        function confirmDelete(form) {
+            if (confirm("Are you sure you want to delete this item?")) {
+                form.submit();
+            }
+        }
+    </script>
+{% endmacro %}
